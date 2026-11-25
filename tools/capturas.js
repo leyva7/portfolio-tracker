@@ -1,9 +1,9 @@
 // Capturas de la app con la cartera de EJEMPLO (sin datos reales) para la documentación.
-// Uso: node tools/capturas.js [app.html]   → docs/capturas/*.png
+// Uso: node tools/capturas.js [app.html]   → docs/screenshots/*.png
 const path = require('path');
 const { openApp } = require('../harness/open.js');
 const html = path.resolve(process.argv[2] || path.join(__dirname, '..', 'app.html'));
-const OUT = path.join(__dirname, '..', 'docs', 'capturas');
+const OUT = path.join(__dirname, '..', 'docs', 'screenshots');
 const TABS = [['resumen', 'inicio'], ['posiciones', 'cartera'], ['analisis', 'analisis'], ['proyeccion', 'plan']];
 (async () => {
   for (const [width, theme] of [[1280, 'light'], [390, 'light'], [390, 'dark']]) {

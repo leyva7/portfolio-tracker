@@ -1,137 +1,137 @@
-# Cartera · tracker de patrimonio e inversiones
+# Cartera · net worth and investment tracker
 
-Una app de una sola página para seguir tu patrimonio: fondos indexados, ETF, acciones, cripto y cuentas de efectivo, todo en euros. Calcula la rentabilidad real (TIR y TWR), los impuestos según las reglas españolas (FIFO y regla de los dos meses) y la evolución frente a un índice. También proyecta tu patrimonio a 20 años.
+A single-page app for tracking your net worth across index funds, ETFs, stocks, crypto and cash accounts, all in euros. It computes real returns (money-weighted IRR and time-weighted TWR) and Spanish capital-gains tax (FIFO plus the two-month wash-sale rule). It also compares your portfolio against a benchmark index and projects your net worth 20 years ahead.
 
-Está pensada para publicarse como **Artifact de claude.ai**: es un único HTML autocontenido. Los datos se guardan en la base de datos del propio Artifact y los precios se actualizan con una rutina de Claude en la nube. Sin esa base de datos, la app arranca en **modo demostración** con una cartera de ejemplo, así que puedes abrir `app.html` en cualquier navegador y verla funcionar.
+It is built to be published as a **claude.ai Artifact**: one self-contained HTML file. Data lives in the Artifact's own database, and prices are refreshed by a scheduled Claude routine in the cloud. Without that database the app starts in **demo mode** with a sample portfolio, so you can open `app.html` in any browser and see it working.
 
-> Todas las cifras de este repositorio y de las capturas son **de ejemplo**: salen de la cartera de demostración simulada (`src/js/app/core/demo.js`) y no corresponden a ninguna persona.
+> The user interface is in Spanish (es-ES). Every figure in this repository and its screenshots is **sample data** from the simulated demo portfolio (`src/js/app/core/demo.js`), not anyone's real portfolio.
 
-| Inicio | Cartera | Análisis | Plan |
+| Home | Portfolio | Analysis | Plan |
 |---|---|---|---|
-| ![Inicio](docs/capturas/inicio-390.png) | ![Cartera](docs/capturas/cartera-390.png) | ![Análisis](docs/capturas/analisis-390.png) | ![Plan](docs/capturas/plan-390.png) |
+| ![Home](docs/screenshots/inicio-390.png) | ![Portfolio](docs/screenshots/cartera-390.png) | ![Analysis](docs/screenshots/analisis-390.png) | ![Plan](docs/screenshots/plan-390.png) |
 
-![Escritorio](docs/capturas/inicio-1280.png)
+![Desktop](docs/screenshots/inicio-1280.png)
 
-## Qué hace
+## Features
 
-La app se organiza en cuatro secciones, cada una responde a una pregunta. Los ajustes van aparte.
+The app has four sections, each answering one question, plus a settings area.
 
-**Inicio: ¿cómo voy?**
-- Patrimonio total (inversiones + efectivo), cambio del día y rentabilidad desde el inicio, con la anual equivalente.
-- «Esta semana»: qué ha movido la cartera, caídas relevantes y una estimación del día para los fondos cuyo valor liquidativo aún no ha llegado.
-- «Para revisar»: como mucho tres avisos (precios antiguos, datos que no cuadran, restos pequeños de posiciones…).
-- Gráfico de evolución: patrimonio frente a dinero aportado con la banda de ganancia, o el reparto por clase de activo.
+**Home (Inicio): how am I doing?**
+- Total net worth (investments + cash), today's change, and the return since inception with its annualized equivalent.
+- "This week": what moved the portfolio, notable drops, and an intraday estimate for funds whose NAV hasn't been published yet.
+- "To review": at most three alerts, such as stale prices, data that doesn't reconcile, or tiny leftover positions.
+- Evolution chart: net worth against money contributed, with the gain band, or a breakdown by asset class.
 
-**Cartera: ¿qué tengo?**
-- Posiciones con valor, ganancia y mini gráfico, más una ficha por activo con su histórico, sus operaciones y un simulador de venta que calcula el impacto fiscal.
-- Cuentas de efectivo con sus movimientos (aportaciones, retiradas, intereses).
-- Reparto por clase, por zona geográfica (barras o **mapa mundial**) y por fondo, con pesos objetivo.
-- Una sola lista de movimientos, rebalanceo y la calculadora «Voy a aportar…», que reparte una aportación según los pesos objetivo.
+**Portfolio (Cartera): what do I own?**
+- Positions with value, gain and a sparkline. Each asset has a detail sheet with its history, its trades and a sale simulator that shows the tax impact.
+- Cash accounts and their movements (deposits, withdrawals, interest).
+- Allocation by asset class, by region (bars or a **world map**) and by fund, against target weights.
+- One combined list of transactions, a rebalancing view and an "I'm going to invest…" calculator that splits a contribution by target weights without selling.
 
-**Análisis: ¿lo estoy haciendo bien?**
-- Comparación con un índice de referencia en el mismo periodo (TWR, TIR, diferencia, captura en subidas y bajadas).
-- Mes a mes, qué ha aportado cada fondo, rentabilidad por año y fondo.
-- Riesgo y caídas: volatilidad, máxima caída, semanas de más del 3 %, y eficiencia rentabilidad/riesgo de la cartera.
-- Impuestos: ganancias y pérdidas por año fiscal con FIFO, pérdidas diferidas por recompra (art. 33.5 LIRPF) y tramos del ahorro.
-- «Análisis de Claude»: observaciones generadas por Claude sobre tus propios datos (con la capacidad `sample` del Artifact).
+**Analysis (Análisis): am I doing it right?**
+- Comparison with a benchmark over the same period: TWR, IRR, difference, and upside/downside capture.
+- Month by month, each fund's contribution since inception, and returns by year and fund.
+- Risk and drawdowns: volatility, maximum drawdown, weeks down more than 3 %, and a risk/return efficiency view of the portfolio.
+- Taxes: gains and losses by tax year using FIFO, losses deferred by repurchase (Spanish income tax law, art. 33.5 LIRPF), and the savings-income tax brackets.
+- "Claude's analysis": observations Claude generates from your own data, through the Artifact's `sample` capability.
 
-**Plan: ¿a dónde voy?**
-- Proyección a 20 años con supuestos editables por clase de activo, hitos y tabla año a año.
-- Aportaciones periódicas, objetivo de ahorro y colchón de emergencia.
-- «Mi analista»: un cuestionario de perfil de riesgo (1 a 5), un diagnóstico con reglas y un veredicto de Claude. Incluye un panel de contexto de mercado (BCE, Letras, caída del índice, CAPE, IPC) que solo muestra hechos con fecha y fuente, nunca previsiones.
+**Plan: where am I heading?**
+- A 20-year projection with editable assumptions per asset class, milestones and a year-by-year table.
+- Recurring contributions, a savings goal and an emergency fund.
+- "My analyst" (Mi analista): a risk-profile questionnaire (1 to 5), a rule-based diagnosis and a verdict from Claude. It includes a market-context panel (ECB rate, Spanish T-bills, index drawdown, CAPE, inflation) that shows only dated, sourced facts, never forecasts.
 
-**Ajustes**
-- Alta y edición de activos: fondos por ISIN, ETF y acciones con símbolo, cripto, o precio manual.
-- Importación de CSV propio o de DeGiro, conciliación con extractos de MyInvestor, y exportación.
-- Datos a salvo: papelera de 90 días con «Deshacer», copias automáticas diarias y mensuales en la base de datos, y copia manual.
-- Tema claro/oscuro, modo privacidad (oculta importes) y lo que pagas en comisiones de gestión (TER).
+**Settings (Ajustes)**
+- Add and edit assets: funds by ISIN, ETFs and stocks by symbol, crypto, or manual prices.
+- Import your own CSV or a DeGiro export, reconcile with MyInvestor statements, and export everything.
+- Data safety: a 90-day trash with "Undo", automatic daily and monthly backups inside the database, and manual backups.
+- Light/dark theme, a privacy mode that hides amounts, and what you pay in fund fees (TER).
 
-También funciona bien en el móvil, con una barra inferior y hojas deslizantes para los formularios, y se maneja con teclado.
+It works well on mobile, with a bottom navigation bar and slide-up sheets for forms, and it is fully keyboard accessible.
 
-## Probarla en un minuto
+## Try it in a minute
 
 ```bash
 git clone https://github.com/leyva7/portfolio-tracker.git
 cd portfolio-tracker
-open app.html        # o xdg-open / doble clic: arranca en modo demostración
+open app.html        # or xdg-open / double-click: it starts in demo mode
 ```
 
-`app.html` ya viene construido. Solo necesita conexión para cargar Chart.js y la fuente Manrope desde un CDN.
+`app.html` is already built. It only needs a connection to load Chart.js and the Manrope font from a CDN.
 
-## Construir
+## Build
 
-La app se edita en `src/` y se construye con un script sin dependencias (Node 18 o superior):
+You edit the app in `src/` and build it with a dependency-free script (Node 18 or later):
 
 ```bash
 node build.js              # → app.html
-node build.js otro.html    # → otro destino
+node build.js other.html   # → another output path
 ```
 
-`build.js` concatena los ficheros de `src/` en el orden de su lista `PARTS`. Si hay algún fichero en `src/` que no está en la lista, el build falla, para que nada se quede fuera sin darte cuenta.
+`build.js` concatenates the files in `src/` in the order of its `PARTS` list. If a file in `src/` is missing from that list, the build fails, so nothing gets left out silently.
 
-## Pruebas
+## Tests
 
 ```bash
-npm i -D playwright && npx playwright install chromium   # solo la primera vez
+npm i -D playwright && npx playwright install chromium   # first time only
 tests/run-all.sh
 ```
 
-- `tests/engine.test.js`: el motor de cálculo con una cartera sintética cuyas cifras se comprueban a mano (FIFO, divisa, ganancias, XIRR).
-- `tests/smoke.js`: abre la app en escritorio (1280 px) y móvil (390 px), en modo demostración y con una base de datos simulada, y recorre todas las secciones sin errores de JavaScript.
-- `tools/demo-seed.js` genera `fixtures/demo-seed.json` a partir de la cartera de demostración, para el arnés.
-- `tools/capturas.js` regenera las capturas de `docs/capturas/`.
+- `tests/engine.test.js` checks the calculation engine against a synthetic portfolio whose figures were worked out by hand (FIFO, currency conversion, realized gains, XIRR).
+- `tests/smoke.js` opens the app at desktop (1280 px) and mobile (390 px) widths, both in demo mode and against a mocked database, and visits every section with no JavaScript errors.
+- `tools/demo-seed.js` generates `fixtures/demo-seed.json` from the demo portfolio for the test harness.
+- `tools/capturas.js` regenerates the screenshots in `docs/screenshots/`.
 
-## Publicarla como Artifact
+## Publishing it as an Artifact
 
-1. `node build.js` y `tests/run-all.sh`.
-2. Publica `app.html` como Artifact de claude.ai con las capacidades `db` (obligatoria para guardar datos), `sample` (análisis de Claude), `mcp` (para lanzar la rutina de precios con *Claude Code Remote*) y `downloads` (exportar).
-3. Crea la rutina de precios (ver [docs/rutinas.md](docs/rutinas.md)) y pon su id en `NAV_TASK` (`src/js/app/core/prices.js`) o en el documento `settings/main` como `navTask`.
-4. Opcional: escribe tu nombre en `settings/main.nombre` para que la cabecera diga «Hola, <nombre>».
+1. Run `node build.js` and `tests/run-all.sh`.
+2. Publish `app.html` as a claude.ai Artifact with these capabilities: `db` (required to save data), `sample` (Claude's analysis), `mcp` (to start the price routine through *Claude Code Remote*) and `downloads` (export).
+3. Create the price routine (see [docs/routines.md](docs/routines.md)). Put its id in `NAV_TASK` (`src/js/app/core/prices.js`) or as `navTask` in the `settings/main` document.
+4. Optional: set your name in `settings/main.nombre` so the header greets you by name.
 
-## Estructura
+## Layout
 
 ```
-app.html             la app construida (un único fichero)
-build.js             construye app.html a partir de src/
+app.html             the built app (one file)
+build.js             builds app.html from src/
 src/
-  head.html, body.html, tail.html   cabecera, marcado y cierre
-  styles/                           CSS por bloques (base, componentes, móvil, tema «Calma», animaciones…)
-  js/engine.js                      motor de cálculo: funciones puras, sin DOM
-  js/motion.js                      ayudas de animación
-  js/app/                           la app, por áreas (core, ui, tabs, modals, import, data)
-harness/             arnés de Playwright con una base de datos simulada (mock de window.claude)
-tests/               pruebas del motor y de la interfaz
-tools/               datos de ejemplo y capturas
-rutinas/             scripts y plantillas de las rutinas de Claude (precios, correos diario y semanal)
-docs/                arquitectura, rutinas y capturas
+  head.html, body.html, tail.html   page head, markup and closing tags
+  styles/                           CSS by area (base, components, mobile, "Calma" theme, motion…)
+  js/engine.js                      calculation engine: pure functions, no DOM
+  js/motion.js                      animation helpers
+  js/app/                           the app, by area (core, ui, tabs, modals, import, data)
+harness/             Playwright harness with a mocked database (window.claude mock)
+tests/               engine and UI tests
+tools/               demo data and screenshots
+rutinas/             scripts and prompt templates for the Claude routines (prices, daily and weekly emails)
+docs/                architecture, routines and screenshots
 ```
 
-Más detalle en [docs/arquitectura.md](docs/arquitectura.md).
+More detail in [docs/architecture.md](docs/architecture.md).
 
-## Rutinas en la nube
+## Cloud routines
 
-Tres tareas programadas de Claude Code completan la app:
+Three scheduled Claude Code tasks complete the app:
 
-- **Actualizar precios** (días laborables, 21:40 de Madrid): busca el valor liquidativo de cada fondo por ISIN, las cotizaciones de ETF, acciones y cripto y el cambio del dólar, y los guarda en la base de datos.
-- **Resumen diario** (días laborables, 22:45): un correo con el patrimonio, el día del mercado en tu cartera, un calendario del mes y titulares de al menos dos fuentes.
-- **Resumen semanal** (domingos): un correo más completo, con tres ideas de mejora y una copia de seguridad.
+- **Update prices** (weekdays, 21:40 Madrid time): fetches each fund's NAV by ISIN, quotes for ETFs, stocks and crypto, and the USD/EUR rate, and saves them to the database.
+- **Daily summary** (weekdays, 22:45): an email with your net worth, what the market did to your portfolio today, a monthly calendar and headlines from at least two sources.
+- **Weekly summary** (Sundays): a fuller email with three improvement ideas and a backup.
 
-| Correo diario | Correo semanal |
+| Daily email | Weekly email |
 |---|---|
-| ![Correo diario](docs/capturas/correo-diario-390.png) | ![Correo semanal](docs/capturas/correo-semanal-390.png) |
+| ![Daily email](docs/screenshots/correo-diario-390.png) | ![Weekly email](docs/screenshots/correo-semanal-390.png) |
 
-Los correos los generan scripts de Python sin dependencias (`rutinas/correo/`) a partir de la base de datos, con cifras exactas. Claude solo lee los datos, ejecuta los scripts y envía el resultado. Todo está en [docs/rutinas.md](docs/rutinas.md).
+The emails are generated by dependency-free Python scripts (`rutinas/correo/`) straight from the database, with exact figures. Claude only reads the data, runs the scripts and sends the result. See [docs/routines.md](docs/routines.md).
 
-## Decisiones de diseño
+## Design decisions
 
-- **Euros como base.** Los activos en dólares se convierten con el cambio de cada día.
-- **FIFO** para el coste y las ganancias, como exige el IRPF. Los traspasos entre fondos conservan el coste y la antigüedad de los lotes.
-- **El efectivo suma al patrimonio pero no entra en TWR ni TIR**, para que la rentabilidad mida solo las inversiones.
-- **No se inventan datos.** Un precio sin fecha no se guarda, una cifra que falta no se muestra, y la estimación del día se etiqueta siempre como estimación.
-- **Sin recomendaciones de inversión.** El análisis describe y compara, no dice qué comprar ni cuándo.
+- **Euro base.** USD assets are converted at each day's rate.
+- **FIFO** for cost basis and gains, as Spanish income tax requires. Fund-to-fund transfers keep the lots' cost and dates.
+- **Cash counts toward net worth but not toward TWR or IRR**, so returns measure investments only.
+- **Nothing is made up.** A price without a date is not saved, a missing figure is not shown, and the intraday estimate is always labelled as an estimate.
+- **No investment advice.** The analysis describes and compares; it never says what to buy or when.
 
-## Licencia
+## License
 
-[MIT](LICENSE). Incluye [Chart.js](https://www.chartjs.org/) 4.4.1 (MIT) en `harness/` para las pruebas sin red. El mapa usa geometría de [Natural Earth](https://www.naturalearthdata.com/), que es de dominio público.
+[MIT](LICENSE). Bundles [Chart.js](https://www.chartjs.org/) 4.4.1 (MIT) in `harness/` for offline tests. The world map uses [Natural Earth](https://www.naturalearthdata.com/) geometry (public domain).
 
-Esto es un proyecto personal, no asesoramiento financiero.
+This is a personal project, not financial advice.

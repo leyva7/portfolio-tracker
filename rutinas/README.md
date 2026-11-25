@@ -1,3 +1,3 @@
-# Rutinas
+# Routines
 
-Scripts y plantillas de las rutinas de Claude en la nube (precios y correos diario y semanal). La documentación está en [../docs/rutinas.md](../docs/rutinas.md).
+Scripts and prompt templates for the Claude cloud routines (price updates, daily and weekly emails). See [../docs/routines.md](../docs/routines.md).
