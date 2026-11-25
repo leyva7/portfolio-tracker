@@ -1,10 +1,10 @@
 /* ================= Cash, asset classes, patrimony ================= */
-const CLASSES = [['rv', 'Renta variable', '--s1'], ['rf', 'Renta fija', '--s3'], ['oro', 'Oro', '--s4'], ['cripto', 'Cripto', '--s2'], ['otro', 'Otros', '--s9'], ['cash', 'Efectivo', '--s7']];
+const CLASSES = [['rv', 'Equities', '--s1'], ['rf', 'Bonds', '--s3'], ['oro', 'Gold', '--s4'], ['cripto', 'Crypto', '--s2'], ['otro', 'Other', '--s9'], ['cash', 'Cash', '--s7']];
 const CLS_LABEL = Object.fromEntries(CLASSES.map(([k, l]) => [k, l]));
 const clsColor = (k) => cssv((CLASSES.find((c) => c[0] === k) || CLASSES[4])[2]);
 const clsOf = (a) => a.cls || (a.type === 'crypto' ? 'cripto' : a.type === 'cash' ? 'cash' : 'rv');
 function cashList() { return (DEMO ? demoData.cash : Object.values(S.cash)).slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0)); }
-const MV_TYPES = { open: 'Saldo inicial', in: 'Ingreso', out: 'Retirada', interest: 'Intereses', adjust: 'Ajuste' };
+const MV_TYPES = { open: 'Opening balance', in: 'Deposit', out: 'Withdrawal', interest: 'Interest', adjust: 'Adjustment' };
 /** Movements of an account, oldest first: [{id, d, a, t, n}]. Older docs that only have snapshots (h) are read as opening + adjustments. */
 function cashMoves(c) {
   let mv = Object.entries(c.mv || {}).map(([id, m]) => ({ id, d: m.d, a: +m.a || 0, t: m.t || (m.a >= 0 ? 'in' : 'out'), n: m.n || '' })).filter((m) => /^\d{4}-\d{2}-\d{2}$/.test(m.d));
@@ -26,27 +26,27 @@ function goalInfo() {
   const g = S.settings && S.settings.goal; if (DEMO || !g || !(+g.amount > 0)) return null;
   const cu = cushionInfo(), cash = cu ? cu.free : cashTotal() /* the emergency cushion never counts towards the goal */, amt = +g.amount, left = Math.max(0, amt - cash), today = todayStr();
   const from = E.addDays(today, -91); // pace: what comes from outside (salary, savings, interest), not the money from your own sales
-  const pace = cashList().flatMap((c) => cashMoves(c)).filter((m) => m.d > from && m.d <= today && m.t !== 'open' && m.t !== 'adjust' && !(m.t === 'in' && /^venta\b/i.test(m.n || ''))).reduce((s, m) => s + (+m.a || 0), 0) / 3;
+  const pace = cashList().flatMap((c) => cashMoves(c)).filter((m) => m.d > from && m.d <= today && m.t !== 'open' && m.t !== 'adjust' && !(m.t === 'in' && /^sale\b/i.test(m.n || ''))).reduce((s, m) => s + (+m.a || 0), 0) / 3;
   const mLeft = g.date && g.date > today ? (Date.parse(g.date) - Date.parse(today)) / (30.44 * 864e5) : null;
   const need = mLeft ? left / Math.max(mLeft, 0.5) : null;
   const eta = left <= 0 ? today : pace > 0 ? E.addDays(today, Math.ceil(left / pace * 30.44)) : null;
-  return { name: g.name || 'Objetivo', amount: amt, date: g.date || null, cash, left, share: Math.min(1, cash / amt), pace, need, eta, cu: cu || null };
+  return { name: g.name || 'Goal', amount: amt, date: g.date || null, cash, left, share: Math.min(1, cash / amt), pace, need, eta, cu: cu || null };
 }
 function goalPanel(compact) {
   const g = goalInfo();
-  if (!g) return compact ? '' : `<section class="panel"><div class="panel-h"><div><h2>Objetivo de ahorro</h2><span class="small muted">por ejemplo, la entrada del piso</span></div><button class="btn primary small" type="button" data-act="goal-edit">Fijar objetivo</button></div></section>`;
+  if (!g) return compact ? '' : `<section class="panel"><div class="panel-h"><div><h2>Savings goal</h2><span class="small muted">for example, a house deposit</span></div><button class="btn primary small" type="button" data-act="goal-edit">Set a goal</button></div></section>`;
   const done = g.left <= 0;
   const late = g.date && g.eta && g.eta > g.date;
-  const lines = done ? [`<b class="gain noarr">Objetivo alcanzado.</b> Tienes ${eur(g.cash - g.amount, 0)} por encima.`] : [
-    `Faltan <b class="num">${eur(g.left, 0)}</b>${g.date ? ` para el ${fdate(g.date)}` : ''}.`,
-    g.need != null ? `Necesitas ahorrar unos <b class="num">${eur(g.need, 0)}</b> al mes.` : '',
-    `Ahorro que entra de fuera, últimos 3 meses: <span class="num ${cls(g.pace)}">${eurS(g.pace, 0)}</span>/mes${g.pace > 0 ? ` → lo alcanzarías hacia <b class="${late ? 'loss' : ''}">${fdate(g.eta, { day: undefined })}</b>${late ? ' (después de tu fecha)' : ''}` : ' → a este ritmo no se alcanza'}.`];
-  return `<section class="panel"><div class="panel-h"><div><h2>${esc(g.name)}</h2><span class="small muted">${g.cu ? `efectivo sin el colchón (${eur(g.cu.amount, 0)})` : 'efectivo'} frente a tu objetivo de ${eur(g.amount, 0)}</span></div>${compact ? '<a href="#efectivo" data-goto="efectivo" class="small">Ver efectivo</a>' : '<button class="btn ghost small" type="button" data-act="goal-edit">Editar</button>'}</div>
+  const lines = done ? [`<b class="gain noarr">Goal reached.</b> You are ${eur(g.cash - g.amount, 0)} above it.`] : [
+    `<b class="num">${eur(g.left, 0)}</b> to go${g.date ? ` by ${fdate(g.date)}` : ''}.`,
+    g.need != null ? `You need to save about <b class="num">${eur(g.need, 0)}</b> a month.` : '',
+    `New savings coming in, last 3 months: <span class="num ${cls(g.pace)}">${eurS(g.pace, 0)}</span>/month${g.pace > 0 ? ` → you would reach it around <b class="${late ? 'loss' : ''}">${fdate(g.eta, { day: undefined })}</b>${late ? ' (after your date)' : ''}` : ' → at this pace you won\'t reach it'}.`];
+  return `<section class="panel"><div class="panel-h"><div><h2>${esc(g.name)}</h2><span class="small muted">${g.cu ? `cash excluding the emergency fund (${eur(g.cu.amount, 0)})` : 'cash'} against your goal of ${eur(g.amount, 0)}</span></div>${compact ? '<a href="#cash" data-goto="cash" class="small">See cash</a>' : '<button class="btn ghost small" type="button" data-act="goal-edit">Edit</button>'}</div>
     <div class="goal-row"><span class="num" style="font-size:22px;font-weight:700">${eur(g.cash, 0)}</span><span class="num muted">${pct(g.share, 0)}</span></div>
-    <div class="goalbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(g.share * 100)}" aria-label="Progreso del objetivo"><span style="width:${(g.share * 100).toFixed(1)}%"></span></div>
+    <div class="goalbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(g.share * 100)}" aria-label="Goal progress"><span style="width:${(g.share * 100).toFixed(1)}%"></span></div>
     <p class="small" style="margin:0;line-height:1.6">${lines.filter(Boolean).join(compact ? ' ' : '<br>')}</p>
-    ${g.cu ? `<p class="small muted" style="margin:0">Para el objetivo cuentan <b class="num">${eur(g.cash, 0)}</b> de tus ${eur(g.cu.cash, 0)} de efectivo; el resto es tu colchón de emergencia.</p>` : ''}
-    ${compact ? '' : '<p class="note" style="margin:0">El ritmo cuenta lo que entra y sale de tus cuentas, sin el dinero de tus ventas de fondos.</p>'}</section>`;
+    ${g.cu ? `<p class="small muted" style="margin:0"><b class="num">${eur(g.cash, 0)}</b> of your ${eur(g.cu.cash, 0)} in cash count towards the goal; the rest is your emergency fund.</p>` : ''}
+    ${compact ? '' : '<p class="note" style="margin:0">The pace counts what goes in and out of your accounts, excluding money from selling funds.</p>'}</section>`;
 }
 /** Emergency cushion (settings.cushion = {months, spend} or {amount}, goal: discount it from the savings goal). */
 function cushionInfo() {
@@ -57,64 +57,64 @@ function cushionInfo() {
 }
 function cushionPanel() {
   const c = cushionInfo();
-  if (!c) return `<section class="panel"><div class="panel-h"><div><h2>Colchón de emergencia</h2><span class="small muted">lo que no tocas, por ejemplo 6 meses de gastos</span></div><button class="btn small" type="button" data-act="cushion-edit">Fijar colchón</button></div></section>`;
+  if (!c) return `<section class="panel"><div class="panel-h"><div><h2>Emergency fund</h2><span class="small muted">money you don't touch, for example 6 months of expenses</span></div><button class="btn small" type="button" data-act="cushion-edit">Set it up</button></div></section>`;
   const full = c.cash >= c.amount;
-  return `<section class="panel"><div class="panel-h"><div><h2>Colchón de emergencia</h2><span class="small muted">${c.months && c.spend ? `${NF({ maximumFractionDigits: 1 }).format(c.months)} meses × ${eur(c.spend, 0)} de gasto` : 'importe fijo'}</span></div><button class="btn ghost small" type="button" data-act="cushion-edit">Editar</button></div>
+  return `<section class="panel"><div class="panel-h"><div><h2>Emergency fund</h2><span class="small muted">${c.months && c.spend ? `${NF({ maximumFractionDigits: 1 }).format(c.months)} months × ${eur(c.spend, 0)} of spending` : 'fixed amount'}</span></div><button class="btn ghost small" type="button" data-act="cushion-edit">Edit</button></div>
     <div class="stats">
-      <div class="stat"><span class="k">Colchón</span><span class="v num">${eur(c.amount, 0)}</span></div>
-      <div class="stat"><span class="k">Cubierto con tu efectivo<small>${pct(c.covered / c.amount, 0)} del colchón${c.cover != null ? ` · tu efectivo da para ${NF({ maximumFractionDigits: 1 }).format(c.cover)} meses de gastos` : ''}</small></span><span class="v num noarr ${full ? 'gain' : 'loss'}">${eur(c.covered, 0)}</span></div>
-      ${(() => { const g = S.settings && S.settings.goal && +S.settings.goal.amount > 0 ? S.settings.goal : null; if (!g) return `<div class="stat"><span class="k">Disponible por encima del colchón<small>efectivo − colchón</small></span><span class="v num">${eur(c.free, 0)}</span></div>`;
+      <div class="stat"><span class="k">Emergency fund</span><span class="v num">${eur(c.amount, 0)}</span></div>
+      <div class="stat"><span class="k">Covered by your cash<small>${pct(c.covered / c.amount, 0)} of the fund${c.cover != null ? ` · your cash covers ${NF({ maximumFractionDigits: 1 }).format(c.cover)} months of expenses` : ''}</small></span><span class="v num noarr ${full ? 'gain' : 'loss'}">${eur(c.covered, 0)}</span></div>
+      ${(() => { const g = S.settings && S.settings.goal && +S.settings.goal.amount > 0 ? S.settings.goal : null; if (!g) return `<div class="stat"><span class="k">Available above the emergency fund<small>cash − emergency fund</small></span><span class="v num">${eur(c.free, 0)}</span></div>`;
         const forGoal = Math.min(c.free, +g.amount), libre = Math.max(0, c.free - +g.amount);
-        return `<div class="stat"><span class="k">Para «${esc(g.name || 'tu objetivo')}»<small>lo que queda tras el colchón</small></span><span class="v num">${eur(forGoal, 0)}</span></div><div class="stat"><span class="k">Libre de verdad<small>efectivo − colchón − objetivo</small></span><span class="v num">${eur(libre, 0)}</span></div>`; })()}
+        return `<div class="stat"><span class="k">For "${esc(g.name || 'your goal')}"<small>what is left after the emergency fund</small></span><span class="v num">${eur(forGoal, 0)}</span></div><div class="stat"><span class="k">Truly free<small>cash − emergency fund − goal</small></span><span class="v num">${eur(libre, 0)}</span></div>`; })()}
     </div>
-    ${full ? '' : `<p class="small" style="margin:8px 0 0">Te faltan <b class="num">${eur(c.amount - c.covered, 0)}</b> para completar el colchón.</p>`}</section>`;
+    ${full ? '' : `<p class="small" style="margin:8px 0 0">You need <b class="num">${eur(c.amount - c.covered, 0)}</b> more to complete the emergency fund.</p>`}</section>`;
 }
 function openCushionForm() {
-  if (DEMO) return toast('La cartera de ejemplo no se puede editar.');
-  const c = (S.settings && S.settings.cushion) || {}; const n = (v) => (v ? esc(String(v).replace('.', ',')) : '');
-  openModal(`<div class="panel-h"><h2>Colchón de emergencia</h2><button class="btn ghost" type="button" data-close>Cerrar</button></div>
+  if (DEMO) return toast('The sample portfolio cannot be edited.');
+  const c = (S.settings && S.settings.cushion) || {}; const n = (v) => (v ? esc(String(v)) : '');
+  openModal(`<div class="panel-h"><h2>Emergency fund</h2><button class="btn ghost" type="button" data-close>Close</button></div>
   <form class="form" id="cuForm" novalidate>
-    <label class="f half">Meses<input type="text" inputmode="decimal" id="cuM" value="${n(c.months || (c.amount ? '' : 6))}" placeholder="6"></label>
-    <label class="f half">Gasto mensual (€)<input type="text" inputmode="decimal" id="cuS" value="${n(c.spend)}" placeholder="1.500"></label>
-    <label class="f full">O un importe fijo (€) <span class="hint">si lo rellenas, manda sobre meses × gasto</span><input type="text" inputmode="decimal" id="cuA" value="${n(c.amount)}"></label>
-    <label class="full small"><input type="checkbox" id="cuG" ${c.goal ? 'checked' : ''}> Descontar el colchón del objetivo de ahorro (el piso)</label>
-    <p class="note full">El colchón sale de tus cuentas de efectivo. Si indicas el gasto mensual, también verás cuántos meses cubre tu efectivo.</p>
+    <label class="f half">Months<input type="text" inputmode="decimal" id="cuM" value="${n(c.months || (c.amount ? '' : 6))}" placeholder="6"></label>
+    <label class="f half">Monthly spending (€)<input type="text" inputmode="decimal" id="cuS" value="${n(c.spend)}" placeholder="1,500"></label>
+    <label class="f full">Or a fixed amount (€) <span class="hint">if filled in, it overrides months × spending</span><input type="text" inputmode="decimal" id="cuA" value="${n(c.amount)}"></label>
+    <label class="full small"><input type="checkbox" id="cuG" ${c.goal ? 'checked' : ''}> Subtract the emergency fund from the savings goal</label>
+    <p class="note full">The emergency fund comes out of your cash accounts. If you enter your monthly spending, you will also see how many months your cash covers.</p>
     <div class="err full" id="cuErr"></div>
-    <div class="form-actions full">${S.settings && S.settings.cushion ? '<button class="btn danger" type="button" id="cuDel">Quitar colchón</button>' : ''}<button class="btn" type="button" data-close>Cancelar</button><button class="btn primary" type="submit">Guardar</button></div>
+    <div class="form-actions full">${S.settings && S.settings.cushion ? '<button class="btn danger" type="button" id="cuDel">Remove emergency fund</button>' : ''}<button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Save</button></div>
   </form>`, () => {
-    const del = $('#cuDel'); if (del) del.addEventListener('click', async () => { try { await saveSettings({ cushion: null }); closeModal(); toast('Colchón quitado.'); } catch (e) { $('#cuErr').textContent = 'No se pudo guardar: ' + (e.message || e.code); } });
+    const del = $('#cuDel'); if (del) del.addEventListener('click', async () => { try { await saveSettings({ cushion: null }); closeModal(); toast('Emergency fund removed.'); } catch (e) { $('#cuErr').textContent = 'Could not save: ' + (e.message || e.code); } });
     $('#cuForm').addEventListener('submit', async (ev) => {
       ev.preventDefault(); const v = (id) => { const x = $(id).value.trim(); return x ? parseNum(x) : null; };
       const m = v('#cuM'), sp = v('#cuS'), a = v('#cuA');
-      if ([m, sp, a].some((x) => x != null && !(Number.isFinite(x) && x > 0))) return ($('#cuErr').textContent = 'Usa importes y meses positivos.');
-      if (!a && !(m && sp)) return ($('#cuErr').textContent = 'Indica meses y gasto mensual, o un importe fijo.');
+      if ([m, sp, a].some((x) => x != null && !(Number.isFinite(x) && x > 0))) return ($('#cuErr').textContent = 'Use positive amounts and months.');
+      if (!a && !(m && sp)) return ($('#cuErr').textContent = 'Enter months and monthly spending, or a fixed amount.');
       const cu = { goal: $('#cuG').checked }; if (m) cu.months = +m.toFixed(1); if (sp) cu.spend = +sp.toFixed(2); if (a) cu.amount = +a.toFixed(2);
-      try { await saveSettings({ cushion: cu }); closeModal(); toast('Colchón guardado.'); }
-      catch (e) { $('#cuErr').textContent = 'No se pudo guardar: ' + (e.message || e.code); }
+      try { await saveSettings({ cushion: cu }); closeModal(); toast('Emergency fund saved.'); }
+      catch (e) { $('#cuErr').textContent = 'Could not save: ' + (e.message || e.code); }
     });
   });
 }
 function openGoalForm() {
-  if (DEMO) return toast('La cartera de ejemplo no se puede editar.');
+  if (DEMO) return toast('The sample portfolio cannot be edited.');
   const g = (S.settings && S.settings.goal) || {};
-  openModal(`<div class="panel-h"><h2>Objetivo de ahorro</h2><button class="btn ghost" type="button" data-close>Cerrar</button></div>
+  openModal(`<div class="panel-h"><h2>Savings goal</h2><button class="btn ghost" type="button" data-close>Close</button></div>
   <form class="form" id="gForm" novalidate>
-    <label class="f full">Nombre<input type="text" id="gName" value="${esc(g.name || 'Entrada del piso')}"></label>
-    <label class="f half">Importe (€)<input type="text" inputmode="decimal" id="gAmt" value="${g.amount ? esc(String(g.amount).replace('.', ',')) : ''}" required placeholder="40.000"></label>
-    <label class="f half">Fecha <span class="hint">opcional</span><input type="date" id="gDate" value="${esc(g.date || '')}"></label>
-    ${(() => { const c = S.settings && S.settings.cushion; return `<label class="f half">Tu gasto al mes (€) <span class="hint">para el colchón${c && +c.spend > 0 ? ` · ahora ${eur(+c.spend, 0)}` : ''}</span><input type="text" inputmode="decimal" id="gSpend" value="" placeholder="p. ej. 1.200"></label><label class="f half">Meses de colchón<input type="text" inputmode="decimal" id="gMonths" value="${esc(String((c && +c.months) || 6))}"></label>`; })()}
-    <p class="note full">Cuenta tu efectivo menos el colchón (gasto × meses), que no se toca.</p>
+    <label class="f full">Name<input type="text" id="gName" value="${esc(g.name || 'House deposit')}"></label>
+    <label class="f half">Amount (€)<input type="text" inputmode="decimal" id="gAmt" value="${g.amount ? esc(String(g.amount)) : ''}" required placeholder="40,000"></label>
+    <label class="f half">Date <span class="hint">optional</span><input type="date" id="gDate" value="${esc(g.date || '')}"></label>
+    ${(() => { const c = S.settings && S.settings.cushion; return `<label class="f half">Your monthly spending (€) <span class="hint">for the emergency fund${c && +c.spend > 0 ? ` · now ${eur(+c.spend, 0)}` : ''}</span><input type="text" inputmode="decimal" id="gSpend" value="" placeholder="e.g. 1,200"></label><label class="f half">Months of emergency fund<input type="text" inputmode="decimal" id="gMonths" value="${esc(String((c && +c.months) || 6))}"></label>`; })()}
+    <p class="note full">It counts your cash minus the emergency fund (spending × months), which stays untouched.</p>
     <div class="err full" id="gErr"></div>
-    <div class="form-actions full">${g.amount ? '<button class="btn danger" type="button" id="gDel">Quitar objetivo</button>' : ''}<button class="btn" type="button" data-close>Cancelar</button><button class="btn primary" type="submit">Guardar</button></div>
+    <div class="form-actions full">${g.amount ? '<button class="btn danger" type="button" id="gDel">Remove goal</button>' : ''}<button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Save</button></div>
   </form>`, () => {
-    const del = $('#gDel'); if (del) del.addEventListener('click', async () => { try { await saveSettings({ goal: null }); closeModal(); toast('Objetivo quitado.'); } catch (e) { $('#gErr').textContent = 'No se pudo guardar: ' + (e.message || e.code); } });
+    const del = $('#gDel'); if (del) del.addEventListener('click', async () => { try { await saveSettings({ goal: null }); closeModal(); toast('Goal removed.'); } catch (e) { $('#gErr').textContent = 'Could not save: ' + (e.message || e.code); } });
     $('#gForm').addEventListener('submit', async (ev) => {
       ev.preventDefault(); const amt = parseNum($('#gAmt').value); const d = $('#gDate').value;
-      if (!Number.isFinite(amt) || amt <= 0) return ($('#gErr').textContent = 'Indica un importe positivo.');
-      if (d && d <= todayStr()) return ($('#gErr').textContent = 'La fecha tiene que ser futura.');
+      if (!Number.isFinite(amt) || amt <= 0) return ($('#gErr').textContent = 'Enter a positive amount.');
+      if (d && d <= todayStr()) return ($('#gErr').textContent = 'The date must be in the future.');
       const sp = parseNum($('#gSpend').value), mo = parseNum($('#gMonths').value); const cu0 = (S.settings && S.settings.cushion) || {};
-      try { await saveSettings(Object.assign({ goal: { name: $('#gName').value.trim() || 'Objetivo', amount: +amt.toFixed(2), date: d || null } }, sp > 0 ? { cushion: Object.assign({}, cu0, { spend: +sp.toFixed(2), months: mo > 0 ? mo : +cu0.months || 6, amount: null }) } : {})); closeModal(); toast('Objetivo guardado.'); }
-      catch (e) { $('#gErr').textContent = 'No se pudo guardar: ' + (e.message || e.code); }
+      try { await saveSettings(Object.assign({ goal: { name: $('#gName').value.trim() || 'Goal', amount: +amt.toFixed(2), date: d || null } }, sp > 0 ? { cushion: Object.assign({}, cu0, { spend: +sp.toFixed(2), months: mo > 0 ? mo : +cu0.months || 6, amount: null }) } : {})); closeModal(); toast('Objetivo guardado.'); }
+      catch (e) { $('#gErr').textContent = 'Could not save: ' + (e.message || e.code); }
     });
   });
 }

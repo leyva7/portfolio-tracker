@@ -5,7 +5,7 @@
 The published app is a single file, `app.html`, with no local dependencies. It loads only two things from outside: Chart.js 4.4.1 from jsDelivr and the Manrope font from Google Fonts. The file is **generated**: the code lives in `src/`, and `build.js` concatenates it in this order:
 
 1. `head.html`
-2. One `<style>` block with `styles/` (base, header-nav, components, forms, tiles, mobile, polish, mobile-v21, calma, secciones)
+2. One `<style>` block with `styles/` (base, header-nav, components, forms, tiles, mobile, polish, mobile-v21, calm-theme, sections)
 3. `body.html`, the static markup: sidebar, tabs, `#view`, modal and mobile navigation
 4. `<style id="anim">` with `motion.css`, then `js/motion.js`
 5. Chart.js (CDN)
@@ -59,31 +59,31 @@ Pure functions that take `{assets, txs, history, fx, benchmark, settings}` and r
 | `navs/{assetId}` | Prices written by the routine: `m` = `{date: price}`, plus `kind`, `source`, `checked` and, for funds, `ret`/`annual` (published returns). `navs/fx-USD` holds euros per dollar and `navs/bench` the benchmark |
 | `history/{id}`, `fx/{ccy}` | Older series `{points: [[date, value]]}`, merged with `navs` |
 | `bench/main` | Benchmark: `name`, `ccy` and `points` |
-| `settings/main` | Settings: `riskFree`, benchmark (`benchSymbol`, `benchName`…), the "My analyst" `profile`, `recurring`, `goal`, `navTask`, `nombre` (display name) |
+| `settings/main` | Settings: `riskFree`, benchmark (`benchSymbol`, `benchName`…), the "My analyst" `profile`, `recurring`, `goal`, `navTask`, `displayName` |
 | `jobs/funds` | Status of the last price update (`queued`, `done` or `error`, with per-asset results) |
-| `insights/claude`, `insights/analista` | Latest analyses by Claude |
-| `insights/mercado` | Market context (ECB, T-bills, inflation, index drawdown, CAPE), each with date and source |
-| `insights/estimacion` | Intraday estimate per index, written by the daily routine |
+| `insights/claude`, `insights/analyst` | Latest analyses by Claude |
+| `insights/market` | Market context (ECB, T-bills, inflation, index drawdown, CAPE), each with date and source |
+| `insights/estimate` | Intraday estimate per index, written by the daily routine |
 | `trash/*`, `backups/*`, `backupData/*` | 90-day trash, and daily and monthly backups split into chunks of at most 180 KB |
 
 Every write goes through `save()`/`remove()`, which retry once on an `unavailable` error. Before anything is deleted or edited, the previous version goes to the trash and an "Undo" toast appears.
 
-## Sections (`tabs/secciones.js`)
+## Sections (`tabs/sections.js`)
 
-The internal tab keys come from earlier versions and are kept so existing links still work:
+Each section has a tab key, which is also the URL hash (`app.html#analysis`):
 
 | Visible section | Key | What it groups |
 |---|---|---|
-| Home (Inicio) | `resumen` | Summary, intraday estimate, alerts, evolution |
-| Portfolio (Cartera) | `posiciones` | Positions, cash, allocation (regions and map), transactions, rebalancing |
-| Analysis (Análisis) | `analisis` | Benchmark, month by month, drawdowns, efficiency, taxes, Claude's analysis |
-| Plan | `proyeccion` | Projection, contributions, goals, "My analyst" |
-| Settings (Ajustes) | `activos` | Assets, import/export, backups, theme |
+| Home | `home` | Summary, intraday estimate, alerts, evolution |
+| Portfolio | `portfolio` | Positions, cash, allocation (regions and map), transactions, rebalancing |
+| Analysis | `analysis` | Benchmark, month by month, drawdowns, efficiency, taxes, Claude's analysis |
+| Plan | `plan` | Projection, contributions, goals, "My analyst" |
+| Settings | `settings` | Assets, import/export, backups, theme |
 
-`efectivo` (cash), `operaciones` (transactions) and `fiscal` (taxes) are detail views with a back link.
+`cash`, `transactions` and `taxes` are detail views with a back link.
 
 ## Test harness (`harness/`)
 
 - `mock.js` replaces `window.claude` with an in-memory database. It is seeded from `window.__SEED` (collection → `{id: document}`) and fakes `sample`, `mcp`, `downloads` and `permissions`. Writes are recorded in `window.__WRITES`.
 - `open.js` opens the app in Playwright at the width, theme and seed you ask for, and serves Chart.js locally (`chart.umd.js`). With `mock: false` there is no `window.claude`, so the app opens in demo mode.
-- `tools/demo-seed.js` builds the seed from the demo portfolio. With `--db <folder>` it also writes a folder in ArtifactData format, which is handy for testing the scripts in `rutinas/correo/`.
+- `tools/demo-seed.js` builds the seed from the demo portfolio. With `--db <folder>` it also writes a folder in ArtifactData format, which is handy for testing the scripts in `routines/email/`.

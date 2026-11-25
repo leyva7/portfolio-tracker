@@ -1,9 +1,9 @@
-/* ---------- Resumen: «Estimación del día» (idea 18) ----------
- * Mientras no llega el valor liquidativo de un fondo, su movimiento estimado con el cierre de su índice en euros.
- * Los cierres los guarda la tarea del correo diario en insights/estimacion: {updated, days: {fecha: {us|em|small|oro: {name, chg %, via}}}}.
- * Para cada fondo se encadenan los días posteriores a su último precio; al llegar el precio de ese día, deja de contarse.
+/* ---------- Home: "Today's estimate" (idea 18) ----------
+ * Until a fund's NAV arrives, its estimated move from the close of its index in euros.
+ * The closes are stored by the daily email routine in insights/estimate: {updated, days: {date: {us|em|small|gold: {name, chg %, via}}}}.
+ * For each fund the days after its last price are chained; once that day's price arrives, it stops counting.
  */
-const EST_KEY = { us: 'us', em: 'em', small: 'small', oro: 'oro' };
+const EST_KEY = { us: 'us', em: 'em', small: 'small', oro: 'gold' };
 function estimRows() {
   if (!res || DEMO || !S.estim || !S.estim.days) return [];
   const days = S.estim.days; const ds = Object.keys(days).sort(); const today = res.totals.today; const out = [];
@@ -20,16 +20,16 @@ function estimRows() {
   return out.sort((a, b) => b.p.value - a.p.value);
 }
 const dShort = (d) => fdate(d, { weekday: 'short', day: 'numeric', month: 'short', year: undefined }).replace(',', '');
-/** Short fund name: drops the share-class tail («Index Fund P-Acc-EUR», «UCITS ETF (Acc)»…). */
+/** Short fund name: drops the share-class tail ("Index Fund P-Acc-EUR", "UCITS ETF (Acc)"…). */
 const shortName = (a) => { const n = String(a.name || a.ticker || ''); const s = n.replace(/\s+(index\b.*|ucits\b.*|fund\b.*|\(ie\).*|eur acc.*)$/i, '').trim(); return s.length >= 6 ? s : n; };
 function estPanel() {
   const R = estimRows(); if (!R.length) return '';
   const tot = R.reduce((s, r) => s + r.eur, 0), base = R.reduce((s, r) => s + r.p.value, 0); const P = patrimony();
   const all = [...new Set(R.flatMap((r) => r.dates))].sort();
-  const when = all.length === 1 ? `del ${dShort(all[0])}` : `del ${dShort(all[0])} al ${dShort(all[all.length - 1])}`;
-  return `<section class="panel" id="estPanel"><div class="panel-h"><div><h2>Estimación hasta el último cierre <span class="chip">estim.</span></h2><div class="small muted">aún no ha llegado el precio de ${R.length === 1 ? 'un fondo' : `${R.length} fondos`} ${when}</div></div></div>
-    <div class="est-tot"><span class="num">≈ <span class="${cls(tot)}">${eurS(tot, 0)}</span></span><span class="small muted">≈ ${pctS(base ? tot / base : null, 1)} en esos fondos · patrimonio ≈ <span class="num">${eur(P.total + tot, 0)}</span></span></div>
-    <div class="stats est-list">${R.map((r) => `<div class="stat"><span class="k">${esc(shortName(r.p.asset))}<small>${esc(r.idx)}${r.dates.length > 1 ? ` · ${r.dates.length} sesiones` : ` · ${dShort(r.dates[0])}`} · ${pctS(r.chg, 1)}</small></span><span class="v num">≈ <span class="${cls(r.eur)}">${eurS(r.eur, 0)}</span></span></div>`).join('')}</div>
-    <p class="small muted" style="margin:0">Con el cierre del índice de cada fondo pasado a euros${R.some((r) => r.proxy) ? ' (las small caps, con VB y VSS de EE. UU.)' : ''}. El fondo puede diferir unas décimas. Se quita sola al llegar el valor liquidativo.</p>
+  const when = all.length === 1 ? `on ${dShort(all[0])}` : `from ${dShort(all[0])} to ${dShort(all[all.length - 1])}`;
+  return `<section class="panel" id="estPanel"><div class="panel-h"><div><h2>Estimate up to the last close <span class="chip">est.</span></h2><div class="small muted">the price of ${R.length === 1 ? 'one fund' : `${R.length} funds`} ${when} has not arrived yet</div></div></div>
+    <div class="est-tot"><span class="num">≈ <span class="${cls(tot)}">${eurS(tot, 0)}</span></span><span class="small muted">≈ ${pctS(base ? tot / base : null, 1)} in those funds · net worth ≈ <span class="num">${eur(P.total + tot, 0)}</span></span></div>
+    <div class="stats est-list">${R.map((r) => `<div class="stat"><span class="k">${esc(shortName(r.p.asset))}<small>${esc(r.idx)}${r.dates.length > 1 ? ` · ${r.dates.length} sessions` : ` · ${dShort(r.dates[0])}`} · ${pctS(r.chg, 1)}</small></span><span class="v num">≈ <span class="${cls(r.eur)}">${eurS(r.eur, 0)}</span></span></div>`).join('')}</div>
+    <p class="small muted" style="margin:0">From the close of each fund's index converted to euros${R.some((r) => r.proxy) ? ' (small caps with the US-listed VB and VSS)' : ''}. The fund may differ by a few tenths. It goes away by itself when the NAV arrives.</p>
   </section>`;
 }

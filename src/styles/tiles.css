@@ -39,7 +39,7 @@ a{color:var(--accent)}
 .cash-bal{font-family:var(--f-display);font-size:22px;font-weight:700;letter-spacing:-.01em}
 .cash-acc .toolbar .btn.small,.rowact .btn.small{padding:5px 10px;font-size:13px}
 
-/* Mi analista */
+/* My analyst */
 .an-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 10px}
 .an-verdict{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:10px;background:var(--surface-2);border-left:4px solid var(--muted);margin:0 0 12px}
 .an-verdict .k{font-size:13px;color:var(--ink-2)}

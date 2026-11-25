@@ -34,6 +34,6 @@ const out = PARTS.map((p) => { if (p.startsWith('<')) return p; used.add(path.no
 // Every source file must be listed, so nothing is silently left out of the page
 const walk = (d) => fs.readdirSync(path.join(SRC, d), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]));
 const extra = walk('').filter((f) => !used.has(path.normalize(f)));
-if (extra.length) { console.error('Ficheros de src/ sin incluir en build.js: ' + extra.join(', ')); process.exit(1); }
+if (extra.length) { console.error('Files in src/ not listed in build.js: ' + extra.join(', ')); process.exit(1); }
 fs.writeFileSync(OUT, out);
-console.log(`${path.relative(process.cwd(), OUT) || OUT}: ${out.split('\n').length} líneas, ${Buffer.byteLength(out)} bytes, ${used.size} ficheros`);
+console.log(`${path.relative(process.cwd(), OUT) || OUT}: ${out.split('\n').length} lines, ${Buffer.byteLength(out)} bytes, ${used.size} files`);

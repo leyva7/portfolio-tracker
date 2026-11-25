@@ -5,7 +5,7 @@ Usage: python3 -I market.py <data.json> <db_folder> <TODAY> <quotes_folder> <hea
 
 [out estimate.json] (optional): TODAY's change of each index in euros, for the app's intraday estimate:
   {"date": TODAY, "idx": {"us": {"name", "chg", "via"}, "em": {...}, "small": {...}, "gold": {...}}}  (chg in %, TODAY's data only)
-  estimate.py then merges it into the insights/estimacion document in the database.
+  estimate.py then merges it into the insights/estimate document in the database.
 
 <quotes_folder> holds what the routine downloads from Alpha Vantage:
   SPY.csv, EEM.csv, IUSN.DEX.csv, 4GLD.DEX.csv  -> GLOBAL_QUOTE CSV text as returned (header + 1 row)

@@ -1,8 +1,8 @@
-/* ===== Secciones (v3): Inicio, Cartera, Análisis, Plan ===== */
+/* ===== Sections (v3): Home, Portfolio, Analysis, Plan ===== */
 .col-stack{display:flex;flex-direction:column;gap:16px;min-width:0}
 .since{display:inline-block;font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:1px 8px;vertical-align:2px;white-space:nowrap}
 h2 .since{margin-left:4px}
-/* Back link of the detail views (Efectivo, Movimientos, Impuestos, Ajustes) */
+/* Back link of the detail views (Cash, Transactions, Taxes, Settings) */
 .backlink{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;font-size:15px;font-weight:700;color:var(--accent);text-decoration:none;padding:6px 2px;min-height:44px}
 .backlink svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .backlink:hover{text-decoration:underline}
@@ -42,7 +42,7 @@ h2 .since{margin-left:4px}
 .zm-li i{width:12px;height:12px;border-radius:3px;background:var(--accent);align-self:center}
 .zm-li .zm-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .zm-li .small{grid-column:2 / 4}
-/* Efectivo and Movimientos cards in Cartera */
+/* Cash and Transactions cards in Portfolio */
 .cc-tot{font-size:22px}
 .cc-list{display:flex;flex-direction:column}
 .cc-row{display:flex;align-items:center;gap:12px;padding:8px 0;color:inherit;text-decoration:none;min-height:44px}
@@ -57,7 +57,7 @@ h2 .since{margin-left:4px}
 .mv-r>.num{white-space:nowrap;font-weight:700}
 .pos-foot .btn{min-height:36px}
 .cashsw{background:var(--accent-soft);border:1px solid var(--accent)}
-/* Análisis */
+/* Analysis */
 .an-top{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap}
 .an-more summary{font-size:13px;color:var(--muted);cursor:pointer}
 .an-more .stats{margin-top:8px}
@@ -67,17 +67,17 @@ h2 .since{margin-left:4px}
 .pj-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
 .pj-chips .chip{font-weight:500;background:var(--surface-2);color:var(--ink)}
 @media (max-width:560px){.rv-tag{min-width:0}.cc-tot{font-size:17px}.zm-lg{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
-/* Movimientos (escritorio): la nota se parte en líneas para que la tabla quepa sin desbordar la página */
+/* Transactions (desktop): the note wraps so the table fits without overflowing the page */
 .txtbl td:nth-child(9){white-space:normal;min-width:90px;max-width:170px;font-size:13px;line-height:1.35}
 .txtbl tr.cashrow td:nth-child(3){white-space:nowrap}
 .txtbl .rowact{flex-wrap:wrap;justify-content:flex-end}
 .txtbl td:last-child{white-space:normal;width:1%}.txtbl td:last-child .rowact{min-width:0;max-width:150px}.txtbl td:nth-child(3){max-width:190px;white-space:normal}
 @media (min-width:901px){.txtbl th,.txtbl td{padding-left:6px;padding-right:6px}.txtbl td:nth-child(9){min-width:70px}}
-/* Toques de al menos 44 px en los enlaces y botones pequeños de las secciones */
+/* Touch targets of at least 44 px on the small links and buttons of the sections */
 .pos-foot a,.pos-foot .btn,.rv-i>a,.rv-i>.btn{display:inline-flex;align-items:center;min-height:44px;min-width:44px}
 .rv-i>a{justify-content:flex-end}
 .mcard .tk.tkc{white-space:normal;overflow:visible;text-overflow:clip}
-/* Revisión 1 de la implementación */
+/* Implementation review 1 */
 .heat th:first-child{position:sticky;left:0;z-index:2;background:var(--surface);box-shadow:6px 0 6px -6px rgba(0,0,0,.18)}
 .heat th:first-child::before{content:"";position:absolute;top:-2px;bottom:-2px;right:100%;width:18px;background:var(--surface)}
 .heat thead th:first-child{background:var(--surface)}
@@ -88,7 +88,7 @@ h2 .since{margin-left:4px}
 #zmInfo{margin:0;min-height:1.5em}
 .zmap>.seg{align-self:flex-start;width:auto}
 .g-2e:has(>section[hidden]){grid-template-columns:minmax(0,1fr)}
-/* Plan: la proyección que suma */
+/* Plan: the projection that adds up */
 #pjTiles{grid-template-columns:minmax(0,1fr)}
 .pj-sum{display:flex;flex-direction:column;gap:14px}
 .pj-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
@@ -101,9 +101,9 @@ h2 .since{margin-left:4px}
 .pj-eq b{font-size:17px}.pj-eq .op{font-size:22px;color:var(--muted);align-self:center}
 .pj-eq .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
 @media (max-width:560px){.pj-big{font-size:32px!important}.pj-eq b{font-size:15px}.pj-rng{text-align:left}}
-/* Escritorio: tablas que caben y la tarjeta del patrimonio solo en Inicio */
+/* Desktop: tables that fit and the net worth card only on Home */
 @media (min-width:1024px){
-  body[data-tab]:not([data-tab="resumen"]) .top .brand{display:none}
+  body[data-tab]:not([data-tab="home"]) .top .brand{display:none}
   .postbl th,.postbl td{padding-left:6px;padding-right:6px}
   .postbl .asset-cell .nm{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
@@ -132,7 +132,7 @@ h2 .since{margin-left:4px}
   .pj-eq>div .s{grid-column:1 / 3}
   .pj-eq>div:last-child{border-top:1.5px solid var(--ink);padding-top:8px}
 }
-#idxPanel,#riskPanel,#mesPanel{scroll-margin-top:76px}
+#idxPanel,#riskPanel,#monthPanel{scroll-margin-top:76px}
 /* Ronda 4 */
 .pdate{white-space:nowrap!important;max-width:none!important}
 .pown{color:var(--accent);font-weight:700;margin-left:2px;cursor:help}

@@ -1,12 +1,12 @@
 /* ================= State ================= */
-const S = { assets: {}, txs: {}, history: {}, fx: {}, navs: {}, cash: {}, insights: null, analista: null, mercado: null, estim: null, job: null, bench: null, settings: {}, trash: {}, backups: {} };
+const S = { assets: {}, txs: {}, history: {}, fx: {}, navs: {}, cash: {}, insights: null, analyst: null, market: null, estim: null, job: null, bench: null, settings: {}, trash: {}, backups: {} };
 const loaded = { assets: false, txs: false, history: false, fx: false, navs: false, cash: false, job: false, bench: false, settings: false };
 let db = null, mcp = null, downloads = null, perms = null, sampleFn = null, dbState = 'pending', dbErr = ''; // pending | ready | none | error
 const bootT = Date.now();
 let DEMO = true; let demoData = null; let res = null;
-const ui = { tab: 'resumen', period: '1A', aPeriod: '1A', showClosed: false, sort: { key: 'value', dir: -1 }, txf: { asset: '', type: '', year: '', q: '' }, fiscalYear: null, refreshing: false, progress: 0, lastErrors: [], deferred: [] };
-try { const saved = JSON.parse(localStorage.getItem('cartera-ui') || '{}'); Object.assign(ui, { period: saved.period || ui.period, aPeriod: saved.aPeriod || ui.aPeriod, aiMode: saved.aiMode === 'analista' ? 'analista' : 'obs' }); } catch (e) {}
-const persistUI = () => { try { localStorage.setItem('cartera-ui', JSON.stringify({ period: ui.period, aPeriod: ui.aPeriod, aiMode: ui.aiMode })); } catch (e) {} };
+const ui = { tab: 'home', period: '1A', aPeriod: '1A', showClosed: false, sort: { key: 'value', dir: -1 }, txf: { asset: '', type: '', year: '', q: '' }, fiscalYear: null, refreshing: false, progress: 0, lastErrors: [], deferred: [] };
+try { const saved = JSON.parse(localStorage.getItem('portfolio-ui') || '{}'); Object.assign(ui, { period: saved.period || ui.period, aPeriod: saved.aPeriod || ui.aPeriod, aiMode: saved.aiMode === 'analyst' ? 'analyst' : 'obs' }); } catch (e) {}
+const persistUI = () => { try { localStorage.setItem('portfolio-ui', JSON.stringify({ period: ui.period, aPeriod: ui.aPeriod, aiMode: ui.aiMode })); } catch (e) {} };
 
 function assetList() {
   const src = DEMO ? demoData.assets : Object.values(S.assets);

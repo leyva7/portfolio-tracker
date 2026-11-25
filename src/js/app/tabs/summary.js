@@ -3,12 +3,12 @@
 function mixBar(pos) {
   const tot = pos.reduce((s, p) => s + p.value, 0); if (pos.length < 2 || !(tot > 0)) return '';
   const top = pos.slice(0, 3), w3 = top.reduce((s, p) => s + p.value, 0) / tot; const nm = (p) => esc(p.asset.ticker || p.asset.name);
-  return `<div class="mixbar-wrap"><div class="panel-h"><h3>Por activo</h3><span class="small muted">las 3 mayores son el ${pct(w3, 0)} de lo invertido</span></div>
-    <div class="mixbar" role="img" aria-label="Peso de cada posición: ${pos.slice(0, 8).map((p) => `${nm(p)} ${pct(p.value / tot, 0)}`).join(', ')}${pos.length > 8 ? ` y ${pos.length - 8} más` : ''}">${pos.map((p) => `<span style="flex:${(p.value / tot).toFixed(4)} 1 0;background:${acolor(p.assetId)}" title="${nm(p)} · ${pct(p.value / tot, 1)}"></span>`).join('')}</div>
-    <div class="mixbar-lg">${top.map((p) => `<span><span class="sw" style="background:${acolor(p.assetId)}"></span>${nm(p)} <span class="num muted">${pct(p.value / tot, 0)}</span></span>`).join('')}${pos.length > 3 ? `<span class="muted">+${pos.length - 3} más</span>` : ''}</div></div>`;
+  return `<div class="mixbar-wrap"><div class="panel-h"><h3>By asset</h3><span class="small muted">the 3 largest are ${pct(w3, 0)} of what is invested</span></div>
+    <div class="mixbar" role="img" aria-label="Weight of each position: ${pos.slice(0, 8).map((p) => `${nm(p)} ${pct(p.value / tot, 0)}`).join(', ')}${pos.length > 8 ? ` and ${pos.length - 8} more` : ''}">${pos.map((p) => `<span style="flex:${(p.value / tot).toFixed(4)} 1 0;background:${acolor(p.assetId)}" title="${nm(p)} · ${pct(p.value / tot, 1)}"></span>`).join('')}</div>
+    <div class="mixbar-lg">${top.map((p) => `<span><span class="sw" style="background:${acolor(p.assetId)}"></span>${nm(p)} <span class="num muted">${pct(p.value / tot, 0)}</span></span>`).join('')}${pos.length > 3 ? `<span class="muted">+${pos.length - 3} more</span>` : ''}</div></div>`;
 }
-function vResumen() {
-  if (!res || !res.series.length) return emptyState('Añade activos y operaciones para ver tu cartera.');
+function vSummary() {
+  if (!res || !res.series.length) return emptyState('Add assets and transactions to see your portfolio.');
   const t = res.totals; const y = ytdInfo(); const P = patrimony();
   const tile = (l, v, s, c) => `<div class="tile"><span class="l">${l}</span><span class="v ${c || ''}">${v}</span>${s ? `<span class="s">${s}</span>` : ''}</div>`;
   const al = classAlloc();
@@ -17,45 +17,45 @@ function vResumen() {
   const maxW = topPos.length ? topPos[0].value : 1;
   return `
   <section class="tiles">
-    ${tile('Plusvalía latente', eurS(t.unrealized, 0), pctS(t.costBasis ? t.unrealized / t.costBasis : null, 1) + ' sobre el coste', cls(t.unrealized))}
-    ${ok(t.xirr) ? tile('TIR anual', pctS(t.xirr, 1), 'ponderada por el dinero', cls(t.xirr)) : tile('TWR anual', pctS(t.twrAnn, 1), 'rentabilidad de la estrategia', cls(t.twrAnn))}
-    ${tile(`En ${t.today.slice(0, 4)}`, y ? eurS(y.pnl, 0) : '—', y ? `TWR ${pctS(y.twr, 1)} · aportado ${eurS(y.invested, 0)}` : '', cls(y && y.pnl))}
-    ${tile('Efectivo', eur(P.cash, 0), P.cash ? `${pct(P.total ? P.cash / P.total : 0, 0)} del patrimonio · TAE ${pct(cashRate(), 2)}` : '<a href="#efectivo" data-goto="efectivo">Añadir cuentas</a>')}
+    ${tile('Unrealized gain', eurS(t.unrealized, 0), pctS(t.costBasis ? t.unrealized / t.costBasis : null, 1) + ' on cost', cls(t.unrealized))}
+    ${ok(t.xirr) ? tile('Annual IRR', pctS(t.xirr, 1), 'money-weighted', cls(t.xirr)) : tile('Annual TWR', pctS(t.twrAnn, 1), 'return of the strategy', cls(t.twrAnn))}
+    ${tile(`In ${t.today.slice(0, 4)}`, y ? eurS(y.pnl, 0) : '—', y ? `TWR ${pctS(y.twr, 1)} · contributed ${eurS(y.invested, 0)}` : '', cls(y && y.pnl))}
+    ${tile('Cash', eur(P.cash, 0), P.cash ? `${pct(P.total ? P.cash / P.total : 0, 0)} of net worth · AER ${pct(cashRate(), 2)}` : '<a href="#cash" data-goto="cash">Add accounts</a>')}
   </section>
   ${estPanel()}
   ${dropPanel()}
   ${goalPanel(true)}
   ${moveBreakdown()}
   <section class="panel">
-    <div class="panel-h"><h2>Evolución del patrimonio</h2>${periodSeg(ui.period, 'p')}</div>
+    <div class="panel-h"><h2>Net worth over time</h2>${periodSeg(ui.period, 'p')}</div>
     <div class="evo-bar">${evoSeg()}<div class="legend" id="mainLegend"></div></div>
-    <div class="chart tall"><canvas id="cMain" role="img" aria-label="Evolución del patrimonio"></canvas></div>
+    <div class="chart tall"><canvas id="cMain" role="img" aria-label="Net worth over time"></canvas></div>
     <div class="small muted" id="mainFoot"></div>
   </section>
   <div class="grid g-2e">
-    <section class="panel"><div class="panel-h"><h2>Reparto</h2><span class="small muted">${eur(P.total, 0)}</span></div>
-      <div class="donut-wrap"><div class="chart donut"><canvas id="cAlloc" role="img" aria-label="Reparto por tipo de activo"></canvas></div>
+    <section class="panel"><div class="panel-h"><h2>Allocation</h2><span class="small muted">${eur(P.total, 0)}</span></div>
+      <div class="donut-wrap"><div class="chart donut"><canvas id="cAlloc" role="img" aria-label="Allocation by asset type"></canvas></div>
       <ul class="alloc-list">${al.map((a, i) => `<li data-di="${i}" tabindex="0"><span class="sw" style="background:${a.color}"></span><span>${a.label}</span><span class="num">${eur(a.value, 0)}</span><span class="num muted">${pct(a.weight, 0)}</span></li>`).join('')}</ul></div>
       ${mixBar(openPos)}
     </section>
-    <section class="panel"><div class="panel-h"><h2>Lo más destacado</h2></div>
-      <div class="ins-list">${ins.map(insightCard).join('') || '<p class="muted">Sin novedades.</p>'}</div>
-      ${insMore.length ? `<details><summary>${insMore.length} indicador${insMore.length === 1 ? '' : 'es'} más</summary><div class="ins-list" style="margin-top:10px">${insMore.map(insightCard).join('')}</div></details>` : ''}
+    <section class="panel"><div class="panel-h"><h2>Highlights</h2></div>
+      <div class="ins-list">${ins.map(insightCard).join('') || '<p class="muted">Nothing new.</p>'}</div>
+      ${insMore.length ? `<details><summary>${insMore.length} more indicator${insMore.length === 1 ? '' : 's'}</summary><div class="ins-list" style="margin-top:10px">${insMore.map(insightCard).join('')}</div></details>` : ''}
     </section>
   </div>
-  <section class="panel"><div class="panel-h"><h2>Principales posiciones</h2><a href="#posiciones" data-goto="posiciones" class="small">Ver todas</a></div>
-    <div class="toppos">${topPos.map((p, i) => `<div class="tp-row"><div class="tp-name"><span class="sw" style="background:${acolor(p.assetId)}"></span><span>${esc(p.asset.name || p.asset.ticker)}</span></div><div class="tp-bar"><span style="--mj:${i};width:${(p.value / maxW * 100).toFixed(1)}%;background:${acolor(p.assetId)}"></span></div><span class="num tp-v" data-fv="t:${esc(p.assetId)}" data-fn="${p.value}">${eur(p.value, 0)}</span><span class="chip ${p.unrealized >= 0 ? 'inc' : 'sell'} num">${pctS(p.unrealizedPct, 1)}</span></div>`).join('')}${moreN > 0 ? `<a href="#posiciones" data-goto="posiciones" class="small">+${moreN} más</a>` : ''}</div>
+  <section class="panel"><div class="panel-h"><h2>Top positions</h2><a href="#portfolio" data-goto="portfolio" class="small">See all</a></div>
+    <div class="toppos">${topPos.map((p, i) => `<div class="tp-row"><div class="tp-name"><span class="sw" style="background:${acolor(p.assetId)}"></span><span>${esc(p.asset.name || p.asset.ticker)}</span></div><div class="tp-bar"><span style="--mj:${i};width:${(p.value / maxW * 100).toFixed(1)}%;background:${acolor(p.assetId)}"></span></div><span class="num tp-v" data-fv="t:${esc(p.assetId)}" data-fn="${p.value}">${eur(p.value, 0)}</span><span class="chip ${p.unrealized >= 0 ? 'inc' : 'sell'} num">${pctS(p.unrealizedPct, 1)}</span></div>`).join('')}${moreN > 0 ? `<a href="#portfolio" data-goto="portfolio" class="small">+${moreN} more</a>` : ''}</div>
   </section>
   ${aiPanel()}`;
 }
-const MB_W = [['S', 'Semana', 7], ['M', 'Mes', 30], ['A', 'Año', 0], ['N', 'Meses', 0]];
+const MB_W = [['S', 'Week', 7], ['M', 'Month', 30], ['A', 'Year', 0], ['N', 'Months', 0]];
 /** Change of the patrimony in the last week / month / this year, split into market, interest, money that came in or went out,
  *  and the sales and buys that only move money between investments and cash. */
 function moveBreakdown() {
   if (!res || !res.series.length || DEMO) return '';
   if (ui.mbw === 'N') return monthBreakdown();
   const k = MB_W.find((w) => w[0] === ui.mbw) || MB_W[0]; let today = res.totals.today;
-  // «Semana»: the calendar week of the latest market closes (a trade of yours today doesn't move it), the same week as the drop warning
+  // "Week": the calendar week of the latest market closes (a trade of yours today doesn't move it), the same week as the drop warning
   const lp = lastMktDate();
   const from = k[0] === 'S' ? E.addDays(monOf(lp || today), -1) : k[2] ? E.addDays(today, -k[2]) : `${today.slice(0, 4) - 1}-12-31`;
   const S2 = res.series; const at = (d) => { let r = null; for (const q of S2) { if (q.date <= d) r = q; else break; } return r || { value: 0, invested: 0, pnl: 0 }; };
@@ -68,45 +68,45 @@ function moveBreakdown() {
   const sold = res.realized.filter((r) => r.date > from && r.date <= today).reduce((t, r) => t + r.proceeds, 0);
   const bought = Object.values(S.txs).filter((x) => x.type === 'buy' && x.date > from && x.date <= today).reduce((t, x) => { const fa = assetById(x.assetId); const f = x.fx || (fa && fa.currency !== 'EUR' ? fxFor(fa.currency, x.date) : 1) || 1; return t + x.qty * x.price * f + (+x.fees || 0); }, 0);
   const row = (l, v, sub) => `<div class="stat"><span class="k">${l}${sub ? `<small>${sub}</small>` : ''}</span><span class="v num ${cls(v)}">${eurS(v, 0)}</span></div>`;
-  return `<section class="panel"><div class="panel-h"><h2>Qué ha movido tu patrimonio</h2><div class="seg" role="group" aria-label="Periodo">${MB_W.map(([id, l]) => `<button type="button" data-mbw="${id}" aria-pressed="${id === k[0]}">${id === 'A' ? today.slice(0, 4) : l}</button>`).join('')}</div></div>
+  return `<section class="panel"><div class="panel-h"><h2>What moved your net worth</h2><div class="seg" role="group" aria-label="Period">${MB_W.map(([id, l]) => `<button type="button" data-mbw="${id}" aria-pressed="${id === k[0]}">${id === 'A' ? today.slice(0, 4) : l}</button>`).join('')}</div></div>
     <div class="stats">
-      ${row('Mercado', market, k[0] === 'S' ? (() => { const fl = {}; for (const x of Object.values(S.txs)) if ((x.type === 'buy' || x.type === 'sell') && x.date > from && x.date <= today && res.txEUR[x.id]) fl[x.assetId] = (fl[x.assetId] || 0) + (x.type === 'buy' ? 1 : -1) * Math.abs(res.txEUR[x.id].eur); const ah = a.holdings || {}, bh = b.holdings || {}; const by = [...new Set([...Object.keys(ah), ...Object.keys(bh)])].map((id) => ({ id, m: (bh[id] || 0) - (ah[id] || 0) - (fl[id] || 0) })).filter((r) => Math.abs(r.m) >= 1).sort((x, y) => Math.abs(y.m) - Math.abs(x.m)).slice(0, 3); return `por el precio de tus inversiones${by.length ? `: ${by.map((r) => `${esc(assetById(r.id)?.ticker || r.id)} ${eurS(r.m, 0)}`).join(' · ')}` : ''}`; })() : 'por el precio de tus inversiones')}
-      ${interest ? row('Intereses del efectivo', interest, 'apuntados en Efectivo') : ''}
-      ${row('Dinero que entra o sale', ext, 'ingresos, retiradas y compras con dinero de fuera')}
-      <div class="stat"><span class="k"><b>Cambio del patrimonio</b><small>${k[0] === 'S' ? `semana del ${fdate(E.addDays(from, 1), { year: undefined })}` : `desde el ${fdate(from)}`}</small></span><span class="v num ${cls(dP)}"><b>${eurS(dP, 0)}</b></span></div>${k[0] === 'S' && today < res.totals.today ? (() => { const after = Object.values(S.txs).filter((x) => x.date > today && ['buy', 'sell'].includes(x.type)).map((x) => `${x.type === 'buy' ? 'compra' : 'venta'} ${esc(assetById(x.assetId)?.ticker || '')} ${eur(Math.abs((res.txEUR[x.id] || {}).eur || 0), 0)}`).concat(cashList().flatMap((c) => cashMoves(c)).filter((m) => m.d > today && m.t !== 'open' && !/^venta\b/i.test(m.n || '')).map((m) => `${m.t === 'interest' ? 'intereses' : m.a >= 0 ? 'ingreso' : 'retirada'} ${eurS(m.a, 0)}`)); return after.length ? `<p class="small muted" style="margin:8px 0 0">Apuntado después del cierre del ${fdate(today, { year: undefined })}: ${after.join(' · ')}. Cuenta en la semana siguiente.</p>` : ''; })() : ''}
+      ${row('Market', market, k[0] === 'S' ? (() => { const fl = {}; for (const x of Object.values(S.txs)) if ((x.type === 'buy' || x.type === 'sell') && x.date > from && x.date <= today && res.txEUR[x.id]) fl[x.assetId] = (fl[x.assetId] || 0) + (x.type === 'buy' ? 1 : -1) * Math.abs(res.txEUR[x.id].eur); const ah = a.holdings || {}, bh = b.holdings || {}; const by = [...new Set([...Object.keys(ah), ...Object.keys(bh)])].map((id) => ({ id, m: (bh[id] || 0) - (ah[id] || 0) - (fl[id] || 0) })).filter((r) => Math.abs(r.m) >= 1).sort((x, y) => Math.abs(y.m) - Math.abs(x.m)).slice(0, 3); return `from the price of your investments${by.length ? `: ${by.map((r) => `${esc(assetById(r.id)?.ticker || r.id)} ${eurS(r.m, 0)}`).join(' · ')}` : ''}`; })() : 'from the price of your investments')}
+      ${interest ? row('Interest on cash', interest, 'recorded in Cash') : ''}
+      ${row('Money in or out', ext, 'deposits, withdrawals and buys with outside money')}
+      <div class="stat"><span class="k"><b>Change in net worth</b><small>${k[0] === 'S' ? `week of ${fdate(E.addDays(from, 1), { year: undefined })}` : `since ${fdate(from)}`}</small></span><span class="v num ${cls(dP)}"><b>${eurS(dP, 0)}</b></span></div>${k[0] === 'S' && today < res.totals.today ? (() => { const after = Object.values(S.txs).filter((x) => x.date > today && ['buy', 'sell'].includes(x.type)).map((x) => `${x.type === 'buy' ? 'buy' : 'sale'} ${esc(assetById(x.assetId)?.ticker || '')} ${eur(Math.abs((res.txEUR[x.id] || {}).eur || 0), 0)}`).concat(cashList().flatMap((c) => cashMoves(c)).filter((m) => m.d > today && m.t !== 'open' && !/^sale\b/i.test(m.n || '')).map((m) => `${m.t === 'interest' ? 'interest' : m.a >= 0 ? 'deposit' : 'withdrawal'} ${eurS(m.a, 0)}`)); return after.length ? `<p class="small muted" style="margin:8px 0 0">Recorded after the close of ${fdate(today, { year: undefined })}: ${after.join(' · ')}. It counts in the following week.</p>` : ''; })() : ''}
     </div>
-    ${sold > 0.5 || bought > 0.5 ? `<p class="small muted" style="margin:8px 0 0">${sold > 0.5 ? `Vendiste por <b class="num">${eur(sold, 0)}</b>` : ''}${sold > 0.5 && bought > 0.5 ? ' y ' : ''}${bought > 0.5 ? `${sold > 0.5 ? 'compraste' : 'Compraste'} por <b class="num">${eur(bought, 0)}</b>` : ''}. Mover dinero entre ventas, Efectivo y compras no cambia el patrimonio; solo cuenta el que entra de fuera.</p>` : ''}
+    ${sold > 0.5 || bought > 0.5 ? `<p class="small muted" style="margin:8px 0 0">${sold > 0.5 ? `You sold <b class="num">${eur(sold, 0)}</b>` : ''}${sold > 0.5 && bought > 0.5 ? ' and ' : ''}${bought > 0.5 ? `${sold > 0.5 ? 'bought' : 'You bought'} <b class="num">${eur(bought, 0)}</b>` : ''}. Moving money between sales, Cash and buys does not change net worth; only money coming in from outside counts.</p>` : ''}
   </section>`;
 }
-vResumen.after = function () {
+vSummary.after = function () {
   if (!res || !res.series.length) return;
   const from = periodFrom(ui.period); const { base, pts } = sliceFrom(from);
   let foot = '';
   const cash = pts.map((p) => cashAt(p.date));
   const C = chartBase(); if (!C) return;
-  if (evoView() === 'tipo') evoByType(pts, cash); else evoTotal(pts, cash);
+  if (evoView() === 'class') evoByType(pts, cash); else evoTotal(pts, cash);
   const last = pts[pts.length - 1], b = base || { pnl: 0 };
   const firstCash = cashList().map((c) => (cashPts(c)[0] || [])[0]).filter(Boolean).sort()[0];
-  foot = (firstCash && firstCash > (pts[0] || {}).date ? `El efectivo cuenta desde que lo registraste (${fdate(firstCash)}). ` : '') + `En el periodo tus inversiones ganaron <b class="${cls(last.pnl - b.pnl)} num">${eurS(last.pnl - b.pnl, 0)}</b>. ` + (evoView() === 'tipo' ? 'Cada franja es una clase de activo, de menos a más riesgo hacia arriba; el borde superior es tu patrimonio total.' : 'La franja entre las dos líneas es lo que has ganado o perdido sobre lo que has puesto. Vender no cambia el patrimonio: el dinero pasa a efectivo.');
+  foot = (firstCash && firstCash > (pts[0] || {}).date ? `Cash counts from when you recorded it (${fdate(firstCash)}). ` : '') + `In the period your investments gained <b class="${cls(last.pnl - b.pnl)} num">${eurS(last.pnl - b.pnl, 0)}</b>. ` + (evoView() === 'class' ? 'Each band is an asset class, from less to more risk going up; the top edge is your total net worth.' : 'The band between the two lines is what you have gained or lost on top of what you put in. Selling does not change net worth: the money moves to cash.');
   $('#mainFoot').innerHTML = foot;
   const al = classAlloc();
   donutLegend(mkDonut($('#cAlloc'), al.map((a) => a.label), al.map((a) => a.value), al.map((a) => a.color)), $('.alloc-list'));
 };
 /* ---------- Resumen: patrimony over time ---------- */
-const evoView = () => { if (ui.evo == null) { try { ui.evo = localStorage.getItem('cartera-evo') || 'total'; } catch (e) { ui.evo = 'total'; } } return ui.evo === 'tipo' ? 'tipo' : 'total'; };
-// 'tipo' stays as the stored key so a saved choice still works; the view now splits by asset class, like the Reparto donut
-function evoSeg() { const v = evoView(); return `<div class="seg" role="group" aria-label="Vista del gráfico" id="evoSeg">${[['total', 'Total'], ['tipo', 'Por clase']].map(([k, l]) => `<button type="button" data-evo="${k}" aria-pressed="${v === k}">${l}</button>`).join('')}</div>`; }
+const evoView = () => { if (ui.evo == null) { try { ui.evo = localStorage.getItem('portfolio-evo') || 'total'; } catch (e) { ui.evo = 'total'; } } return ui.evo === 'class' ? 'class' : 'total'; };
+// 'class' splits the chart by asset class, like the Allocation donut
+function evoSeg() { const v = evoView(); return `<div class="seg" role="group" aria-label="Chart view" id="evoSeg">${[['total', 'Total'], ['class', 'By class']].map(([k, l]) => `<button type="button" data-evo="${k}" aria-pressed="${v === k}">${l}</button>`).join('')}</div>`; }
 /** Total: what you have (investments + cash) against what you put in; the band between them is the gain or loss. */
 function evoTotal(pts, cash) {
   const acc = cssv('--accent'), ink2 = cssv('--chart-base'), g = cssv('--accent'), l = cssv('--loss'), k = darkUI() ? .16 : .12;
   const tot = pts.map((p, i) => p.value + cash[i]), ap = pts.map((p, i) => p.invested + cash[i]);
   const ch = mkLine($('#cMain'), pts.map((p) => p.date), [
-    { label: 'Dinero aportado', data: ap, borderColor: ink2, borderDash: [4, 4], borderWidth: 1.6, stepped: true },
-    { label: 'Patrimonio', data: tot, borderColor: acc, borderWidth: 2.4, fill: { target: 0, above: alpha(g, k), below: alpha(l, k) } },
+    { label: 'Money contributed', data: ap, borderColor: ink2, borderDash: [4, 4], borderWidth: 1.6, stepped: true },
+    { label: 'Net worth', data: tot, borderColor: acc, borderWidth: 2.4, fill: { target: 0, above: alpha(g, k), below: alpha(l, k) } },
   ], { endDots: [1], clean: true, tooltip: {
     itemSort: (x, y) => y.datasetIndex - x.datasetIndex,
-    callbacks: { footer: (it) => { if (!it.length) return ''; const p = pts[it[0].dataIndex], d = p.value - p.invested; return `${d >= 0 ? 'Ganado' : 'Perdido'}: ${eurS(d, 0)}`; } } } });
-  $('#mainLegend').innerHTML = `<span><i class="line" style="background:${acc}"></i>Patrimonio <span class="muted">(inversiones + efectivo)</span></span><span><i class="dash" style="border-color:${ink2}"></i>Dinero aportado</span><span><i style="background:${alpha(g, .18)};box-shadow:inset 0 0 0 1px ${acc}"></i>Ganancia</span>`;
+    callbacks: { footer: (it) => { if (!it.length) return ''; const p = pts[it[0].dataIndex], d = p.value - p.invested; return `${d >= 0 ? 'Gained' : 'Lost'}: ${eurS(d, 0)}`; } } } });
+  $('#mainLegend').innerHTML = `<span><i class="line" style="background:${acc}"></i>Net worth <span class="muted">(investments + cash)</span></span><span><i class="dash" style="border-color:${ink2}"></i>Money contributed</span><span><i style="background:${alpha(g, .18)};box-shadow:inset 0 0 0 1px ${acc}"></i>Gain</span>`;
   return ch;
 }
 // Bottom to top: from the steadiest to the most volatile
@@ -120,7 +120,7 @@ function evoLayers(pts, cash) {
 }
 function evoByType(pts, cash) {
   const lay = evoLayers(pts, cash), a = darkUI() ? .42 : .3;
-  // soft fills with a crisp top edge per layer; same colours as the Reparto donut
+  // soft fills with a crisp top edge per layer; same colours as the Allocation donut
   const ds = lay.map((l, i) => ({ label: l.label, data: l.data, borderColor: l.color, borderWidth: 1.5, backgroundColor: alpha(l.color, a), fill: i ? '-1' : 'origin', stack: 'p' }));
   const ch = mkLine($('#cMain'), pts.map((p) => p.date), ds, { stacked: true, suggestedMin: 0, clean: true, tooltip: {
     filter: (c) => Math.abs(c.parsed.y) > 0.005,
@@ -133,7 +133,7 @@ function evoByType(pts, cash) {
   $('#mainLegend').innerHTML = lay.slice().reverse().map((l) => `<span><i style="background:${l.color}"></i>${l.label}${l.data[k] > 0.5 ? ` <span class="num muted">${pct(t ? l.data[k] / t : 0, 0)}</span>` : ''}</span>`).join('');
   return ch;
 }
-document.addEventListener('click', (e) => { const b = e.target.closest('[data-evo]'); if (!b || b.disabled || b.getAttribute('aria-pressed') === 'true') return; ui.evo = b.dataset.evo; try { localStorage.setItem('cartera-evo', ui.evo); } catch (er) {} render(); });
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-evo]'); if (!b || b.disabled || b.getAttribute('aria-pressed') === 'true') return; ui.evo = b.dataset.evo; try { localStorage.setItem('portfolio-evo', ui.evo); } catch (er) {} render(); });
 /** Legend rows drive the donut: hover (or tap) pulls that slice out, shows it in the centre and dims the rest. */
 function donutLegend(ch, ul) {
   if (!ch || !ul) return;

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Construye app.html y pasa las pruebas. Sale con código distinto de 0 si algo falla.
+# Builds app.html and runs the tests. Exits with a non-zero code if anything fails.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 node build.js

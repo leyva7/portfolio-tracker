@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const mq = matchMedia('(prefers-reduced-motion: reduce)');
-  const TABS = ['resumen', 'posiciones', 'efectivo', 'analisis', 'proyeccion', 'operaciones', 'fiscal', 'activos'];
+  const TABS = ['home', 'portfolio', 'cash', 'analysis', 'plan', 'transactions', 'taxes', 'settings'];
   const ease = (x) => 1 - Math.pow(1 - x, 3);
   const M = window.__motion = { get reduced() { return mq.matches; } };
   let lastTab = null, wasLoading = false, loadT0 = 0, loadTimer = null;
@@ -32,18 +32,18 @@
     flash(el, v > prev); tween(el, prev, v, fmt, 650);
   };
 
-  // Generic counters for tiles/KPIs: animate the first number of the text and keep its format (es-ES).
-  const NUM = /[+\-−]?\d{1,3}(?:\.\d{3})+(?:,\d+)?|[+\-−]?\d+(?:,\d+)?/;
-  const SKIP = /\d{4}-\d{2}|\b(ene|feb|mar|abr|may|jun|jul|ago|sept?|oct|nov|dic)\b|\d+\s?(años?|meses|días?)\b/i;
+  // Generic counters for tiles/KPIs: animate the first number of the text and keep its format (en-GB).
+  const NUM = /[+\-−]?\d{1,3}(?:,\d{3})+(?:\.\d+)?|[+\-−]?\d+(?:\.\d+)?/;
+  const SKIP = /\d{4}-\d{2}|\b(jan|feb|mar|apr|may|jun|jul|aug|sept?|oct|nov|dec)\b|\d+\s?(years?|months?|days?)\b/i;
   function parseCounter(el) {
     if (el.children.length) return null;
     const txt = el.textContent; if (!txt || SKIP.test(txt)) return null;
     const m = txt.match(NUM); if (!m) return null;
     const tok = m[0], sign = /^[+\-−]/.test(tok) ? tok[0] : '', body = sign ? tok.slice(1) : tok;
-    const dec = body.includes(',') ? body.split(',')[1].length : 0, grp = body.includes('.');
-    const n = parseFloat(body.replace(/\./g, '').replace(',', '.')); if (!Number.isFinite(n)) return null;
+    const dec = body.includes('.') ? body.split('.')[1].length : 0, grp = body.includes(',');
+    const n = parseFloat(body.replace(/,/g, '')); if (!Number.isFinite(n)) return null;
     const pre = txt.slice(0, m.index) + sign, post = txt.slice(m.index + tok.length);
-    const fmt = (v) => { let s = Math.abs(v).toFixed(dec); let [i, d] = s.split('.'); if (grp) i = i.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); return pre + i + (d ? ',' + d : '') + post; };
+    const fmt = (v) => { let s = Math.abs(v).toFixed(dec); let [i, d] = s.split('.'); if (grp) i = i.replace(/\B(?=(\d{3})+(?!\d))/g, ','); return pre + i + (d ? '.' + d : '') + post; };
     return { n, fmt, txt, neg: sign === '-' || sign === '−' };
   }
   function counters(v, tab, entering) {
@@ -84,7 +84,7 @@
     if (!v.querySelector('.m-skel')) {
       const tile = '<div class="tile"><span class="m-sk" style="width:45%"></span><span class="m-sk v"></span><span class="m-sk" style="width:35%"></span></div>';
       const rows = (n) => Array.from({ length: n }, (_, i) => `<span class="m-sk r" style="width:${92 - (i * 17) % 40}%"></span>`).join('');
-      v.innerHTML = `<div class="m-skel" aria-busy="true" aria-label="Cargando tu cartera" style="display:contents"><div class="tiles">${tile.repeat(4)}</div><div class="grid g-2"><section class="panel"><span class="m-sk" style="width:30%;height:16px"></span><span class="m-sk c"></span></section><section class="panel"><span class="m-sk" style="width:40%;height:16px"></span>${rows(6)}</section></div></div>`;
+      v.innerHTML = `<div class="m-skel" aria-busy="true" aria-label="Loading your portfolio" style="display:contents"><div class="tiles">${tile.repeat(4)}</div><div class="grid g-2"><section class="panel"><span class="m-sk" style="width:30%;height:16px"></span><span class="m-sk c"></span></section><section class="panel"><span class="m-sk" style="width:40%;height:16px"></span>${rows(6)}</section></div></div>`;
     }
     ink();
     return true;

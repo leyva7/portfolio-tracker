@@ -21,10 +21,10 @@
     collection: (c) => ({ doc: (id) => docRef(c + '/' + id), onSnapshot: (f, err) => { (subsC[c] = subsC[c] || []).push(f); setTimeout(() => f(snapCol(c)), 5); return () => {}; } }),
     doc: (p) => docRef(p),
   };
-  const sample = { json: async (prompt) => { window.__LAST_PROMPT = prompt; await new Promise(r => setTimeout(r, 300)); if (prompt.includes('analista de cartera')) return { verdict: 'mantener', summary: 'Respuesta simulada (mock de pruebas, no es Claude real): la cartera encaja con tu perfil.', items: [{ action: 'mantener', title: 'Sigue como hasta ahora', text: 'Texto simulado.' }, { action: 'raro', title: 'Acción desconocida', text: 'Debe mostrarse como Vigilar.' }], notDo: ['No añadiría bitcoin: texto simulado.', 'No añadiría gestión activa: texto simulado.'] }; return { insights: [
-    { title: 'Observación de prueba', text: 'Texto simulado del análisis (mock de pruebas, no es Claude real).', tone: 'info' },
-    { title: 'Concentración alta', text: 'Las tres mayores posiciones pesan más del 70 %.', tone: 'warn' },
-    { title: 'Aportaciones regulares', text: 'Aportas casi cada mes, buen hábito.', tone: 'good' } ] }; } };
+  const sample = { json: async (prompt) => { window.__LAST_PROMPT = prompt; await new Promise(r => setTimeout(r, 300)); if (prompt.includes('portfolio analyst')) return { verdict: 'keep', summary: 'Simulated answer (test mock, not the real Claude): the portfolio fits your profile.', items: [{ action: 'keep', title: 'Carry on as you are', text: 'Simulated text.' }, { action: 'odd', title: 'Unknown action', text: 'Should be shown as Watch.' }], notDo: ['I would not add bitcoin: simulated text.', 'I would not add active management: simulated text.'] }; return { insights: [
+    { title: 'Test observation', text: 'Simulated analysis text (test mock, not the real Claude).', tone: 'info' },
+    { title: 'High concentration', text: 'The three largest positions weigh more than 70 %.', tone: 'warn' },
+    { title: 'Regular contributions', text: 'You invest almost every month, a good habit.', tone: 'good' } ] }; } };
   const mcp = { listTools: async () => ({ servers: [{ server: 'Alpha Vantage MCP Server' }, { server: 'Claude Code Remote' }] }),
     callTool: async (server, tool, input) => { window.__MCP = (window.__MCP || []).concat([[server, tool, input]]); if (tool === 'fire_trigger') return { content: [{ type: 'text', text: '{"ok":true}' }] }; const e = new Error('mock: sin red'); e.code = 'upstream_error'; throw e; } };
   const downloads = { save: async ({ filename, data }) => { window.__DOWNLOADS = (window.__DOWNLOADS || []).concat([{ filename, size: String(data).length }]); return 'saved'; } };

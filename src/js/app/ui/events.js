@@ -22,28 +22,28 @@ document.addEventListener('click', async (ev) => {
   if (t.dataset.dupTx) return dupTx(t.dataset.dupTx);
   if (t.dataset.repMonth) return openRepeatBuys();
   if (t.dataset.recurring) return recurringAct(t.dataset.recurring);
-  if (t.dataset.gotoTx) { ui.txf = { asset: t.dataset.gotoTx, type: '', year: '', q: '' }; ui.tab = 'operaciones'; closeModal(); render(); window.scrollTo(0, 0); return; }
+  if (t.dataset.gotoTx) { ui.txf = { asset: t.dataset.gotoTx, type: '', year: '', q: '' }; ui.tab = 'transactions'; closeModal(); render(); window.scrollTo(0, 0); return; }
   if (t.dataset.bt) return bottomNav(t.dataset.bt);
   if (t.dataset.sheetTab) { closeModal(); ui.tab = t.dataset.sheetTab; try { history.replaceState(null, '', '#' + ui.tab); } catch (e) {} render(); window.scrollTo(0, 0); return; }
   if (t.dataset.qtx) { closeModal(); return openTxForm({ type: t.dataset.qtx }, null, true); }
-  if (t.dataset.editTx) { const x = S.txs[t.dataset.editTx]; if (x) openTxForm(x); else toast('La cartera de ejemplo no se puede editar.'); return; }
-  if (t.dataset.delTx) { if (DEMO) return toast('La cartera de ejemplo no se puede editar.'); if (t.dataset.armed !== '1') { t.dataset.armed = '1'; t.textContent = delTxLabel(t.dataset.delTx); setTimeout(() => { if (t.isConnected) { t.dataset.armed = ''; t.textContent = 'Borrar'; } }, 3000); return; } await deleteTx(t.dataset.delTx); return; }
+  if (t.dataset.editTx) { const x = S.txs[t.dataset.editTx]; if (x) openTxForm(x); else toast('The sample portfolio cannot be edited.'); return; }
+  if (t.dataset.delTx) { if (DEMO) return toast('The sample portfolio cannot be edited.'); if (t.dataset.armed !== '1') { t.dataset.armed = '1'; t.textContent = delTxLabel(t.dataset.delTx); setTimeout(() => { if (t.isConnected) { t.dataset.armed = ''; t.textContent = 'Delete'; } }, 3000); return; } await deleteTx(t.dataset.delTx); return; }
   if (t.dataset.trashRestore) { t.disabled = true; return restoreTrash(t.dataset.trashRestore); }
   if (t.dataset.snapRestore) return restoreSnapshot(t.dataset.snapRestore, t);
   if (t.dataset.snapDl) return downloadSnapshot(t.dataset.snapDl);
-  if (t.dataset.editAsset) { const a = S.assets[t.dataset.editAsset]; if (a) openAssetForm(a); else toast('La cartera de ejemplo no se puede editar.'); return; }
+  if (t.dataset.editAsset) { const a = S.assets[t.dataset.editAsset]; if (a) openAssetForm(a); else toast('The sample portfolio cannot be edited.'); return; }
   if (t.dataset.delAsset) {
-    if (DEMO) return toast('La cartera de ejemplo no se puede editar.');
+    if (DEMO) return toast('The sample portfolio cannot be edited.');
     const id = t.dataset.delAsset; const used = Object.values(S.txs).filter((x) => x.assetId === id).length;
-    if (used) return toast(`No se puede borrar: tiene ${used} operaciones. Bórralas antes.`);
-    if (t.dataset.armed !== '1') { t.dataset.armed = '1'; t.textContent = '¿Borrar?'; return; }
-    const tid = await toTrash('asset', id, S.assets[id], 'borrado', S.history[id] ? { history: JSON.parse(JSON.stringify(S.history[id])) } : null); await remove('assets', id); if (S.history[id]) await remove('history', id); toast('Activo borrado.', 7000, tid ? { label: 'Deshacer', fn: () => restoreTrash(tid) } : null); return;
+    if (used) return toast(`Cannot delete: it has ${used} transactions. Delete them first.`);
+    if (t.dataset.armed !== '1') { t.dataset.armed = '1'; t.textContent = 'Delete?'; return; }
+    const tid = await toTrash('asset', id, S.assets[id], 'deleted', S.history[id] ? { history: JSON.parse(JSON.stringify(S.history[id])) } : null); await remove('assets', id); if (S.history[id]) await remove('history', id); toast('Asset deleted.', 7000, tid ? { label: 'Undo', fn: () => restoreTrash(tid) } : null); return;
   }
   if (t.dataset.dust) return closeDust(t.dataset.dust, t);
   if (t.dataset.mv) { closeModal(); return openMoveForm(t.dataset.acc, t.dataset.mv); }
   if (t.dataset.mvDel) return deleteMove(t.dataset.acc, t.dataset.mvDel, t);
-  if (t.dataset.editCash) { const c = S.cash[t.dataset.editCash]; if (c) openCashForm(c); else toast('La cartera de ejemplo no se puede editar.'); return; }
-  if (t.dataset.delCash) { if (!S.cash[t.dataset.delCash]) return toast('La cartera de ejemplo no se puede editar.'); if (t.dataset.armed !== '1') { t.dataset.armed = '1'; t.textContent = '¿Borrar?'; return; } const cid = t.dataset.delCash; const tid = await toTrash('cash', cid, S.cash[cid], 'borrado'); await remove('cash', cid); toast('Cuenta borrada.', 7000, tid ? { label: 'Deshacer', fn: () => restoreTrash(tid) } : null); return; }
+  if (t.dataset.editCash) { const c = S.cash[t.dataset.editCash]; if (c) openCashForm(c); else toast('The sample portfolio cannot be edited.'); return; }
+  if (t.dataset.delCash) { if (!S.cash[t.dataset.delCash]) return toast('The sample portfolio cannot be edited.'); if (t.dataset.armed !== '1') { t.dataset.armed = '1'; t.textContent = 'Delete?'; return; } const cid = t.dataset.delCash; const tid = await toTrash('cash', cid, S.cash[cid], 'deleted'); await remove('cash', cid); toast('Account deleted.', 7000, tid ? { label: 'Undo', fn: () => restoreTrash(tid) } : null); return; }
   const act = t.dataset.act;
   if (act === 'start' || act === 'add-asset') return openAssetForm();
   if (act === 'add-tx') return openTxForm();
@@ -61,7 +61,7 @@ document.addEventListener('click', async (ev) => {
   if (act === 'ai-insights') return runAiInsights();
   if (act === 'ai-analyst') return runAiAnalyst();
   if (act === 'profile-edit') return openProfileForm();
-  if (act === 'pj-reset') { const m = pjOpts().mode; try { localStorage.removeItem(PJ_KEY); localStorage.removeItem('cartera-proj2'); } catch (e) {} pjSave({ mode: m }); render(); return; }
+  if (act === 'pj-reset') { const m = pjOpts().mode; try { localStorage.removeItem(PJ_KEY); localStorage.removeItem('portfolio-proj2'); } catch (e) {} pjSave({ mode: m }); render(); return; }
   if (act === 'import') return openImport();
   if (act === 'export-csv') return exportCSV();
   if (act === 'export-json') return exportJSON();
@@ -81,8 +81,8 @@ document.addEventListener('input', (ev) => { if (ev.target.id === 'rbAmt') { ui.
 document.addEventListener('submit', async (ev) => {
   if (ev.target.id !== 'setForm') return; ev.preventDefault();
   const rf = parseNum($('#setRf').value); const sym = $('#setBench').value.trim().toUpperCase();
-  try { await saveSettings({ riskFree: rf >= 0 ? rf / 100 : 0.02, benchSymbol: sym || null, benchName: $('#setBenchName').value.trim(), benchCcy: $('#setBenchCcy').value }); toast(sym && (!S.bench || S.bench.symbol !== sym) ? 'Ajustes guardados. El nuevo índice llega con la próxima actualización de precios.' : 'Ajustes guardados.'); }
-  catch (e) { toast('No se pudo guardar: ' + (e.message || e.code)); }
+  try { await saveSettings({ riskFree: rf >= 0 ? rf / 100 : 0.02, benchSymbol: sym || null, benchName: $('#setBenchName').value.trim(), benchCcy: $('#setBenchCcy').value }); toast(sym && (!S.bench || S.bench.symbol !== sym) ? 'Settings saved. The new index arrives with the next price update.' : 'Settings saved.'); }
+  catch (e) { toast('Could not save: ' + (e.message || e.code)); }
 });
 document.addEventListener('keydown', (ev) => {
   if ($('#overlay').hidden) return;

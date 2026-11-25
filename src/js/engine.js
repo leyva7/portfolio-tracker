@@ -127,7 +127,7 @@
       const f = num(tx.fx, NaN);
       if (Number.isFinite(f) && f > 0) return f;
       const v = fxAt(ccy, tx.date);
-      if (v == null) { warnings.push({ kind: 'fx', ccy, date: tx.date, msg: `Sin tipo de cambio ${ccy}/EUR para ${tx.date}; se usa 1` }); return 1; }
+      if (v == null) { warnings.push({ kind: 'fx', ccy, date: tx.date, msg: `No ${ccy}/EUR exchange rate for ${tx.date}; using 1` }); return 1; }
       return v;
     };
 
@@ -171,7 +171,7 @@
 
     for (const x of txs) {
       const a = assetById[x.assetId];
-      if ((x.type === 'buy' || x.type === 'sell' || x.type === 'dividend' || x.type === 'split') && !a) { warnings.push({ kind: 'asset', msg: `Operación ${x.id || ''} con activo desconocido` }); continue; }
+      if ((x.type === 'buy' || x.type === 'sell' || x.type === 'dividend' || x.type === 'split') && !a) { warnings.push({ kind: 'asset', msg: `Transaction ${x.id || ''} with an unknown asset` }); continue; }
       if (x.type === 'buy') {
         const q = num(x.qty), pr = num(x.price), fees = num(x.fees), fx = txFx(x, a.currency);
         if (q <= 0) continue;
@@ -187,7 +187,7 @@
         if (q <= 0) continue;
         const held = qty[a.id] || 0;
         let sellQ = q;
-        if (q > held + EPS) { warnings.push({ kind: 'oversell', msg: `Venta de ${q} ${a.ticker || a.name} el ${x.date} supera la posición (${+held.toFixed(8)})` }); sellQ = held; }
+        if (q > held + EPS) { warnings.push({ kind: 'oversell', msg: `Sale of ${q} ${a.ticker || a.name} on ${x.date} exceeds the position (${+held.toFixed(8)})` }); sellQ = held; }
         const gross = q * pr * fx;
         const proceeds = gross - fees;                         // net proceeds for the whole order
         const ratio = q > 0 ? sellQ / q : 0;
@@ -220,11 +220,11 @@
       } else if (x.type === 'transfer') {
         // Spanish fund switch (traspaso): no taxable sale, cost basis and acquisition dates carry over to the new fund.
         const b = assetById[x.toAssetId];
-        if (!a || !b) { warnings.push({ kind: 'asset', msg: `Traspaso ${x.id || ''} con fondo desconocido` }); continue; }
+        if (!a || !b) { warnings.push({ kind: 'asset', msg: `Switch ${x.id || ''} with an unknown fund` }); continue; }
         const q = num(x.qty), q2 = num(x.toQty);
         if (q <= 0 || q2 <= 0) continue;
         const held = qty[a.id] || 0; const outQ = Math.min(q, held);
-        if (q > held + EPS) warnings.push({ kind: 'oversell', msg: `Traspaso de ${q} ${a.ticker || a.name} el ${x.date} supera la posición (${+held.toFixed(8)})` });
+        if (q > held + EPS) warnings.push({ kind: 'oversell', msg: `Switch of ${q} ${a.ticker || a.name} on ${x.date} exceeds the position (${+held.toFixed(8)})` });
         const k = q2 / q; let remaining = outQ, moved = 0;
         const L = lots[a.id] || []; const LB = (lots[b.id] = lots[b.id] || []);
         while (remaining > EPS && L.length) {
@@ -392,7 +392,7 @@
     }
     positions.sort((a, b) => b.value - a.value);
     for (const ccy of new Set(positions.filter((p) => p.open).map((p) => p.asset.currency))) {
-      if (ccy && ccy !== BASE && !(fxL[ccy] && fxL[ccy].first)) warnings.push({ kind: 'fx', ccy, msg: `No hay tipo de cambio ${ccy}/EUR: las posiciones en ${ccy} se valoran a 1:1` });
+      if (ccy && ccy !== BASE && !(fxL[ccy] && fxL[ccy].first)) warnings.push({ kind: 'fx', ccy, msg: `No ${ccy}/EUR exchange rate: positions in ${ccy} are valued at 1:1` });
     }
 
     // ---------- Totals ----------

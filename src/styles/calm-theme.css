@@ -1,4 +1,4 @@
-/* ===== Calma: stone background, flat white cards, one ink-blue accent, Manrope only (4 sizes: 40·22·15·13, 2 weights: 500·700) ===== */
+/* ===== Calm: stone background, flat white cards, one ink-blue accent, Manrope only (4 sizes: 40·22·15·13, 2 weights: 500·700) ===== */
 /* Mixed-case labels everywhere: no spaced capitals */
 th,.sheet-h,.mmonth,.txtbl tr.mhead td,.an-verdict .k,.chip,.eyebrow{text-transform:none;letter-spacing:0}
 th{font-size:13px;font-weight:500;color:var(--muted)}
@@ -137,7 +137,7 @@ details summary{font-weight:700}
   #btnPriv svg,#btnRefresh svg,#btnSet svg{width:18px;height:18px}
   .brand{grid-column:1/-1;grid-row:2;padding:18px}
   #refreshProg{grid-column:1/-1;grid-row:3;width:100%}
-  body[data-tab]:not([data-tab="resumen"]) .top .brand{display:none}
+  body[data-tab]:not([data-tab="home"]) .top .brand{display:none}
   .modal{border-radius:28px 28px 0 0}
   .bnav{grid-template-columns:1fr 1fr 64px 1fr 1fr;background:var(--bar);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:6px 2px calc(6px + var(--sab))}
   .bnav button{font-size:13px;font-weight:500;letter-spacing:-.01em;gap:3px;line-height:1.3;color:var(--muted);min-width:0}
@@ -170,8 +170,8 @@ details summary{font-weight:700}
   nav.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:var(--elev);border:0}
   nav.tabs button[aria-selected="true"] .ti{color:var(--accent)}
   .ti{display:block}
-  #tabs [data-tab=activos]{margin-left:0}
-  #tabs [data-tab=activos]::before{content:none}
+  #tabs [data-tab=settings]{margin-left:0}
+  #tabs [data-tab=settings]::before{content:none}
   .top-actions{position:fixed;left:16px;bottom:24px;width:232px;z-index:6;display:flex;flex-direction:column;align-items:stretch;gap:10px}
   .top-actions .row{flex-direction:column;flex-wrap:nowrap;justify-content:stretch;gap:10px}
   .top-actions .row .btn{justify-content:center;min-height:44px;font-size:15px}
@@ -228,9 +228,9 @@ details summary{font-weight:700}
   .eff-tiles{gap:4px 12px}.eff-tiles .tile{padding:8px 0;box-shadow:none;background:none}
   .panel .note{margin:6px 0}
   .mmonth{padding-top:8px}
-  .view .vlrev{padding:0 12px;margin-bottom:8px}
-  .view .vlrev>summary{padding-block:8px}
-  /* Más sheet and forms */
+  .view .navrev{padding:0 12px;margin-bottom:8px}
+  .view .navrev>summary{padding-block:8px}
+  /* More sheet and forms */
   .more-sheet{gap:10px}
   .ms-card{padding:14px 16px}
   .ms-refresh{margin-top:10px;min-height:44px}
@@ -246,7 +246,7 @@ details summary{font-weight:700}
   .toast{bottom:calc(80px + var(--sab))}
 }
 
-/* ---------- Ideas 16-18 (2026-11-22): zonas, caídas en tu historia, estimación del día ---------- */
+/* ---------- Ideas 16-18: regions, drawdowns in your history, today's estimate ---------- */
 .zone-list{display:flex;flex-direction:column;gap:10px}
 .zone-r{display:grid;grid-template-columns:minmax(0,10.5em) minmax(40px,1fr) 5.5em 3.2em;gap:10px;align-items:center;font-size:13px}
 .zone-r .zl{font-weight:700;color:var(--ink)}

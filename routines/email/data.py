@@ -177,7 +177,7 @@ def ops(start, end):
     for c in cash:
         for k, m in (c.get("mv") or {}).items():
             if start <= m["d"] <= end and m["t"] in ("in", "out", "interest") and k not in linked \
-                    and not re.match(r"(?i)^(venta|sale)\b", m.get("n") or ""):
+                    and not re.match(r"(?i)^sale\b", m.get("n") or ""):
                 tp = {"in": "deposit", "out": "withdrawal", "interest": "interest"}[m["t"]]
                 out.append({"date": m["d"], "type": tp, "asset": c.get("name", "Cash"),
                             "amount": round(abs(m["a"]), 2), "note": m.get("n") or ""})
@@ -201,12 +201,12 @@ for p in positions:
 # sales vs cash mismatch (same rule as the app)
 linked = {x["cashMv"]["mv"] for x in txs if isinstance(x.get("cashMv"), dict)}
 allmv = [(k, m) for c in cash for k, m in (c.get("mv") or {}).items()]
-sale_mv = [(k, m) for k, m in allmv if m["a"] > 0 and (k in linked or re.match(r"(?i)^(venta|sale)\b", m.get("n") or ""))]
+sale_mv = [(k, m) for k, m in allmv if m["a"] > 0 and (k in linked or re.match(r"(?i)^sale\b", m.get("n") or ""))]
 if sale_mv:
     first = min(m["d"] for _, m in sale_mv)
     since = max((D(first) - dt.timedelta(days=5)).isoformat(), (today - dt.timedelta(days=90)).isoformat())
     got = sum(x["qty"] * x["price"] * (x.get("fx") or 1) - (x.get("fees") or 0) for x in txs
-              if x["type"] == "sell" and x["date"] >= since and x.get("note") != "Cierre de resto"
+              if x["type"] == "sell" and x["date"] >= since and x.get("note") != "Leftover close-out"
               and not (x["qty"] * x["price"] < 5 and not x.get("cashMv")))
     inc = sum(m["a"] for _, m in sale_mv if m["d"] >= since) + sum(m["a"] for _, m in allmv if m["t"] == "adjust" and m["d"] >= since)
     if got and abs(inc - got) >= 1:

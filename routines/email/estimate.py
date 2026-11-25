@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Merges TODAY's estimate (estimate.json from market.py) into the tracker's insights/estimacion document.
+"""Merges TODAY's estimate (estimate.json from market.py) into the tracker's insights/estimate document.
 
 Usage: python3 -I estimate.py <estimate.json> <current document .json or -> <out .json>
 The document: {"updated": ISO, "days": {"YYYY-MM-DD": {"us": {"name", "chg", "via"}, ...}}}, keeping the last 10 days.

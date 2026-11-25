@@ -13,10 +13,10 @@ function chartAria(ch, fmt) {
     if (ch.config.type === 'doughnut') { const d = ds[0].data, tot = d.reduce((a, b) => a + (+b || 0), 0); s = L.map((l, i) => `${l} ${f(d[i])} (${pct(d[i] / tot, 0)})`).join(', '); }
     else if (ch.config.type === 'bar') {
       if (L.length <= 12 && ds.length === 1) s = L.map((l, i) => `${lab(l)} ${f(num(ds[0].data[i]))}`).join(', ');
-      else s = (L.length > 1 ? `De ${lab(L[0])} a ${lab(L[L.length - 1])}. ` : '') + ds.filter((d) => d.label).slice(0, 4).map((d) => { const v = d.data.map(num); const tot = v.reduce((a, b) => a + (ok(b) ? b : 0), 0); let m = -1; v.forEach((x, i) => { if (ok(x) && (m < 0 || Math.abs(x) > Math.abs(v[m]))) m = i; }); return `${d.label}: total ${f(tot)}${m >= 0 ? `, máximo ${f(v[m])} en ${lab(L[m])}` : ''}`; }).join('. ');
+      else s = (L.length > 1 ? `From ${lab(L[0])} to ${lab(L[L.length - 1])}. ` : '') + ds.filter((d) => d.label).slice(0, 4).map((d) => { const v = d.data.map(num); const tot = v.reduce((a, b) => a + (ok(b) ? b : 0), 0); let m = -1; v.forEach((x, i) => { if (ok(x) && (m < 0 || Math.abs(x) > Math.abs(v[m]))) m = i; }); return `${d.label}: total ${f(tot)}${m >= 0 ? `, maximum ${f(v[m])} in ${lab(L[m])}` : ''}`; }).join('. ');
     } else {
-      const parts = ds.filter((d) => d.label && d.borderColor !== 'transparent' && d.data.some((x) => num(x))).slice(0, 6).map((d) => { const v = d.data.map(num); if (d.mk) return `${d.label}: ${v.filter(ok).length}`; let a = -1, b = -1; v.forEach((x, i) => { if (ok(x)) { if (a < 0) a = i; b = i; } }); return a < 0 ? '' : a === b ? `${d.label}: ${f(v[b])}` : `${d.label}: de ${f(v[a])} a ${f(v[b])}`; }).filter(Boolean);
-      s = (L.length > 1 ? `Del ${lab(L[0])} al ${lab(L[L.length - 1])}. ` : '') + parts.join('. ');
+      const parts = ds.filter((d) => d.label && d.borderColor !== 'transparent' && d.data.some((x) => num(x))).slice(0, 6).map((d) => { const v = d.data.map(num); if (d.mk) return `${d.label}: ${v.filter(ok).length}`; let a = -1, b = -1; v.forEach((x, i) => { if (ok(x)) { if (a < 0) a = i; b = i; } }); return a < 0 ? '' : a === b ? `${d.label}: ${f(v[b])}` : `${d.label}: from ${f(v[a])} to ${f(v[b])}`; }).filter(Boolean);
+      s = (L.length > 1 ? `From ${lab(L[0])} to ${lab(L[L.length - 1])}. ` : '') + parts.join('. ');
     }
     cv.setAttribute('aria-label', (base ? base + '. ' : '') + s);
   } catch (e) {}

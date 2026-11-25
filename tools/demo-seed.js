@@ -1,8 +1,8 @@
-// Genera datos de ejemplo a partir de la cartera de demostración de la app (src/js/app/core/demo.js).
-// No usa ningún dato real: son precios simulados con una semilla fija.
-//   node tools/demo-seed.js                       → fixtures/demo-seed.json (semilla del arnés: colección → {id: documento})
-//   node tools/demo-seed.js --db <carpeta>        → además, una carpeta con el formato de ArtifactData (<col>/<id>.json)
-//   node tools/demo-seed.js --today 2026-11-20    → fija la fecha «hoy» (por defecto, la de hoy)
+// Generates sample data from the app's demo portfolio (src/js/app/core/demo.js).
+// It uses no real data: prices are simulated with a fixed seed.
+//   node tools/demo-seed.js                       → fixtures/demo-seed.json (harness seed: collection → {id: document})
+//   node tools/demo-seed.js --db <folder>         → also a folder in the ArtifactData format (<col>/<id>.json)
+//   node tools/demo-seed.js --today 2026-11-20    → sets "today" (by default, the real date)
 const fs = require('fs'); const path = require('path'); const vm = require('vm');
 const ROOT = path.join(__dirname, '..');
 const arg = (k) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : null; };
@@ -23,15 +23,15 @@ const seed = {
   txs: byId(D.txs.map((x) => Object.assign({ created: x.date + 'T12:00:00Z' }, x))),
   cash: byId(D.cash),
   navs,
-  bench: { main: { ccy: 'EUR', name: 'Bolsa mundial (ejemplo)', symbol: 'VWCE', points: [] } },
-  settings: { main: { riskFree: 0.02, benchName: 'Bolsa mundial (ejemplo)', benchCcy: 'EUR', nombre: 'Ana' } },
+  bench: { main: { ccy: 'EUR', name: 'Global stocks (sample)', symbol: 'VWCE', points: [] } },
+  settings: { main: { riskFree: 0.02, benchName: 'Global stocks (sample)', benchCcy: 'EUR', displayName: 'Alex' } },
   jobs: { funds: { state: 'done', by: 'demo', finishedAt: today + 'T21:45:00Z', results: [] } },
 };
 const out = path.join(ROOT, 'fixtures', 'demo-seed.json');
 fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, JSON.stringify(seed));
-console.log(`${path.relative(process.cwd(), out)}: ${D.assets.length} activos, ${D.txs.length} operaciones, ${D.cash.length} cuentas (hoy = ${today})`);
+console.log(`${path.relative(process.cwd(), out)}: ${D.assets.length} assets, ${D.txs.length} transactions, ${D.cash.length} accounts (today = ${today})`);
 const dbDir = arg('--db');
 if (dbDir) {
   for (const [col, docs] of Object.entries(seed)) { fs.mkdirSync(path.join(dbDir, col), { recursive: true }); for (const [id, d] of Object.entries(docs)) fs.writeFileSync(path.join(dbDir, col, id + '.json'), JSON.stringify(d)); }
-  console.log(`${dbDir}: carpeta con formato ArtifactData`);
+  console.log(`${dbDir}: folder in the ArtifactData format`);
 }

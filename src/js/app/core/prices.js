@@ -1,6 +1,6 @@
 /* ================= Prices =================
- * Every price (fund NAVs, quotes, USD/EUR, benchmark) is written to navs/* by the Claude task «Cartera · actualizar precios»
- * (weekdays 21:40 Madrid, or the «Actualizar precios» button). Manual prices live in history/*.
+ * Every price (fund NAVs, quotes, USD/EUR, benchmark) is written to navs/* by the Claude price-update routine
+ * (weekdays 21:40 Madrid, or the "Update prices" button). Manual prices live in history/*.
  */
 function csvRows(text) {
   const lines = text.replace(/\r/g, '').split('\n').filter((l) => l.trim());
@@ -10,11 +10,11 @@ function csvRows(text) {
 }
 function mcpMsg(e) {
   const c = e && e.code;
-  if (c === 'needs_reauth') return 'La conexión ha caducado. Vuelve a conectarla en claude.ai → Ajustes → Conectores.';
-  if (c === 'blocked_by_policy' || c === 'approval_required') return 'Tu organización bloquea este conector.';
-  if (c === 'not_granted' || c === 'capability_disabled' || c === 'capability_removed') return 'Esta vista no puede usar conectores.';
-  if (c === 'server_unavailable') return 'El proveedor no responde ahora mismo. Prueba en unos minutos.';
-  return (e && e.message) || 'Error desconocido';
+  if (c === 'needs_reauth') return 'The connection has expired. Reconnect it in claude.ai → Settings → Connectors.';
+  if (c === 'blocked_by_policy' || c === 'approval_required') return 'Your organization blocks this connector.';
+  if (c === 'not_granted' || c === 'capability_disabled' || c === 'capability_removed') return 'This view cannot use connectors.';
+  if (c === 'server_unavailable') return 'The provider is not responding right now. Try again in a few minutes.';
+  return (e && e.message) || 'Unknown error';
 }
 
 const isAuto = (a) => a.src !== 'manual' && a.src !== 'nav';
@@ -22,7 +22,7 @@ function mergePts(old, neu) { const m = new Map((old || []).map((p) => [p[0], p[
 
 function firstTxDate(assetId) { let m = null; for (const x of Object.values(S.txs)) if ((!assetId || x.assetId === assetId) && x.date && (!m || x.date < m)) m = x.date; return m; }
 /* ---- Funds: Claude looks up the NAV by ISIN (quefondos.com) in a cloud task fired from here ---- */
-const NAV_TASK = ''; // id de la rutina de precios: ponlo aquí o en settings/main.navTask (ver docs/rutinas.md)
+const NAV_TASK = ''; // id of the price routine: set it here or in settings/main.navTask (see docs/routines.md)
 const CCR = 'Claude Code Remote';
 /** Business days after d up to today (Mon–Fri). */
 function bizLag(d) { let n = 0, x = d; const t = todayStr(); while (x < t && n < 60) { x = E.addDays(x, 1); if (![0, 6].includes(new Date(x + 'T00:00:00Z').getUTCDay())) n++; } return n; }
@@ -55,14 +55,14 @@ const lastPxDate = () => (res ? res.positions.filter((p) => p.open && p.priceDat
 /** Every price (funds, ETFs, stocks, crypto, FX) is refreshed by a Claude task in the cloud: on this button, and on its own every weekday at 21:40. */
 async function refreshCloud(opts = {}) {
   const list = cloudAssets(); if (!list.length) return 'none';
-  if (!(S.settings.navTask || NAV_TASK)) { if (!opts.silent) toast('Configura el id de la rutina de precios (settings/main.navTask).'); return 'skip'; }
+  if (!(S.settings.navTask || NAV_TASK)) { if (!opts.silent) toast('Set the id of the price routine (settings/main.navTask).'); return 'skip'; }
   if (jobBusy()) return 'busy';
   const last = S.job && S.job.state === 'done' && S.job.finishedAt ? Date.parse(S.job.finishedAt) : 0;
   if (!opts.force && Date.now() - last < 15 * 60e3) return 'fresh';
   if (perms) {
     let st = 'prompt'; try { st = await perms.state('mcp:' + CCR); } catch (e) {}
     if (st === 'prompt' && !opts.silent) { try { const r = await perms.request(['mcp:' + CCR]); st = (r && r['mcp:' + CCR]) || st; } catch (e) {} }
-    if (st === 'denied') { await save('jobs', 'funds', { state: 'error', finishedAt: new Date().toISOString(), error: 'Has denegado el permiso "Claude Code Remote" en esta página. Actívalo en el menú de permisos de la página para actualizar precios.' }).catch(() => {}); return 'error'; }
+    if (st === 'denied') { await save('jobs', 'funds', { state: 'error', finishedAt: new Date().toISOString(), error: 'You denied the "Claude Code Remote" permission on this page. Turn it on in the page\'s permissions menu to update prices.' }).catch(() => {}); return 'error'; }
     if (st !== 'granted' && opts.silent) return 'skip';
   }
   const fire = () => mcp.callTool(CCR, 'fire_trigger', { trigger_id: S.settings.navTask || NAV_TASK }, { cache: false });
@@ -72,16 +72,16 @@ async function refreshCloud(opts = {}) {
     catch (e) { if (e && e.retryable) { await sleep(Math.min(e.retryAfterMs || 2000, 15000) + 500); await fire(); } else throw e; }
     ui.fundsFired = true; return 'fired';
   } catch (e) {
-    const msg = e && (e.code === 'server_not_connected' || e.code === 'not_in_manifest') ? 'No se pudo avisar a Claude (conector Claude Code Remote no disponible o no permitido en esta página).' : e && e.code ? mcpMsg(e) : (e && e.message) || String(e);
+    const msg = e && (e.code === 'server_not_connected' || e.code === 'not_in_manifest') ? 'Could not reach Claude (the Claude Code Remote connector is unavailable or not allowed on this page).' : e && e.code ? mcpMsg(e) : (e && e.message) || String(e);
     await save('jobs', 'funds', { state: 'error', finishedAt: new Date().toISOString(), error: msg }).catch(() => {});
     return 'error';
   }
 }
 async function refreshAll() {
-  if (DEMO) return toast('Estás viendo la cartera de ejemplo. Añade tus activos para descargar precios.');
-  if (!mcp) return toast(dbState === 'none' ? 'Abre la página en claude.ai para actualizar precios.' : 'Conectores no disponibles en esta vista.');
+  if (DEMO) return toast('You are viewing the sample portfolio. Add your assets to download prices.');
+  if (!mcp) return toast(dbState === 'none' ? 'Open the page in claude.ai to update prices.' : 'Connectors are not available in this view.');
   const r = await refreshCloud({});
   renderHeader(); renderBanners();
-  toast({ fired: 'Claude está actualizando todos los precios. Tarda 1–3 minutos; la página se actualiza sola.', busy: 'Ya hay una actualización en marcha.', fresh: 'Los precios se actualizaron hace menos de 15 minutos.', none: 'No hay activos con precio automático.', error: 'No se pudo lanzar la actualización. Revisa el aviso de arriba.' }[r] || '', 5000);
+  toast({ fired: 'Claude is updating all prices. It takes 1–3 minutes; the page refreshes by itself.', busy: 'An update is already running.', fresh: 'Prices were updated less than 15 minutes ago.', none: 'There are no assets with automatic prices.', error: 'Could not start the update. See the notice above.' }[r] || '', 5000);
 }
 

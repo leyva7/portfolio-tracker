@@ -1,7 +1,7 @@
-/* ---------- Caídas en tu propia historia (idea 17) ----------
- * Semanas en las que tu cartera (TWR, sin contar aportaciones) cayó más de un umbral, cuánto llegó a caer desde el máximo
- * y cuánto tardó en volver a él. Solo datos de tu historial: nada de previsiones.
- * Resumen lo enseña cuando la semana en curso (o la anterior, lunes y martes) cae más del 3 %; Análisis lo lista con umbral elegible.
+/* ---------- Drawdowns in your own history (idea 17) ----------
+ * Weeks in which your portfolio (TWR, not counting contributions) fell more than a threshold, how far it fell from the high
+ * and how long it took to get back to it. Only data from your history: no forecasts.
+ * Home shows it when the current week (or the previous one, on Monday and Tuesday) falls more than 3 %; Analysis lists them with a selectable threshold.
  */
 const DROP_TH = [0.02, 0.03, 0.05];
 const ddTh = () => (DROP_TH.includes(ui.ddth) ? ui.ddth : 0.03);
@@ -29,14 +29,14 @@ function dropEpisodes(th) {
   }
   return eps;
 }
-const wkLbl = (n) => `${n} semana${n === 1 ? '' : 's'}`;
+const wkLbl = (n) => `${n} week${n === 1 ? '' : 's'}`;
 const mShort = (d) => fdate(d, { day: undefined, month: 'short', year: 'numeric' });
 function epLine(e, since) {
   const w = e.weeks.reduce((m, x) => (x.r < m.r ? x : m), e.weeks[0]);
-  const thin = since && w.end < since ? ' <span class="muted">(con pocos precios diarios)</span>' : '';
-  return `<li><span class="k"><b>${mShort(e.weeks[0].end)}${e.weeks.length > 1 && mShort(e.weeks[e.weeks.length - 1].end) !== mShort(e.weeks[0].end) ? ` – ${mShort(e.weeks[e.weeks.length - 1].end)}` : ''}</b><small>${e.weeks.length > 1 ? `${e.weeks.length} semanas de caída; la peor ` : 'semana '}<span class="num loss">${pctS(w.r, 1)}</span> · llegó a <span class="num">${pct(e.low, 1)}</span> desde el máximo${thin}</small></span><span class="v">${e.rec ? `<b>${wkLbl(e.recWeeks)}</b><small>en volver al máximo</small>` : '<b>sin volver</b><small>al máximo todavía</small>'}</span></li>`;
+  const thin = since && w.end < since ? ' <span class="muted">(with few daily prices)</span>' : '';
+  return `<li><span class="k"><b>${mShort(e.weeks[0].end)}${e.weeks.length > 1 && mShort(e.weeks[e.weeks.length - 1].end) !== mShort(e.weeks[0].end) ? ` – ${mShort(e.weeks[e.weeks.length - 1].end)}` : ''}</b><small>${e.weeks.length > 1 ? `${e.weeks.length} weeks of falls; the worst ` : 'week '}<span class="num loss">${pctS(w.r, 1)}</span> · it reached <span class="num">${pct(e.low, 1)}</span> from the high${thin}</small></span><span class="v">${e.rec ? `<b>${wkLbl(e.recWeeks)}</b><small>to get back to the high</small>` : '<b>not back</b><small>to the high yet</small>'}</span></li>`;
 }
-/** Resumen: only when this week (or last week, early in the week) fell more than 3 %. */
+/** Home: only when this week (or last week, early in the week) fell more than 3 %. */
 function dropPanel() {
   if (!res || DEMO || res.series.length < 30) return '';
   const th = 0.03; const W = weekRets(); if (!W.length) return '';
@@ -48,18 +48,18 @@ function dropPanel() {
   const recs = past.filter((e) => e.rec).map((e) => e.recWeeks);
   const cov = priceCoverage(); const since = cov && cov.since;
   const isThis = cur.mon === monOf(today);
-  return `<section class="panel" id="dropPanel"><div class="panel-h"><div><h2>${isThis ? 'Esta semana' : 'La semana pasada'} tu cartera cae un <span class="loss noarr num">${pct(-cur.r, 1)}</span></h2><div class="small muted">qué pasó las otras veces, solo con tu historial</div></div></div>
-    <p style="margin:0">${nWeeks ? `Desde ${mShort(res.series[0].date)} ha tenido <b>${wkLbl(nWeeks)}</b> que cayeron más de un 3 %${past.length < nWeeks ? `, ${past.length === 1 ? 'todas en la misma racha' : `en ${past.length} rachas`}` : ''}.${recs.length ? (past.length === 1 ? ` Aquella vez tardó <b>${wkLbl(recs[0])}</b> en volver a su máximo anterior.` : ` ${recs.length === past.length ? 'Siempre volvió' : `En ${recs.length} de ${past.length} volvió`} a su máximo anterior, en ${recs.length === 1 ? wkLbl(recs[0]) : `entre ${wkLbl(Math.min(...recs))} y ${wkLbl(Math.max(...recs))}`}.`) : ''}` : 'Es la primera semana con una caída de más del 3 % en tu historial.'}</p>
+  return `<section class="panel" id="dropPanel"><div class="panel-h"><div><h2>${isThis ? 'This week' : 'Last week'} your portfolio is down <span class="loss noarr num">${pct(-cur.r, 1)}</span></h2><div class="small muted">what happened the other times, only from your history</div></div></div>
+    <p style="margin:0">${nWeeks ? `Since ${mShort(res.series[0].date)} it has had <b>${wkLbl(nWeeks)}</b> that fell more than 3 %${past.length < nWeeks ? `, ${past.length === 1 ? 'all in the same run' : `in ${past.length} runs`}` : ''}.${recs.length ? (past.length === 1 ? ` That time it took <b>${wkLbl(recs[0])}</b> to get back to its previous high.` : ` ${recs.length === past.length ? 'It always got back' : `In ${recs.length} of ${past.length} it got back`} to its previous high, in ${recs.length === 1 ? wkLbl(recs[0]) : `between ${wkLbl(Math.min(...recs))} and ${wkLbl(Math.max(...recs))}`}.`) : ''}` : 'It is the first week with a fall of more than 3 % in your history.'}</p>
     ${past.length ? `<ul class="drop-list">${past.slice().reverse().map((e) => epLine(e, since)).join('')}</ul>` : ''}
-    ${cov && cov.low ? '<p class="small muted" style="margin:0">Muchos precios antiguos de tus fondos son sueltos, no diarios: la semana exacta de cada caída puede variar un poco.</p>' : ''}
-    ${now ? `<p class="small muted" style="margin:0">Ahora estás un <span class="num">${pct(-(res.series[res.series.length - 1].index / res.series[now.peakI].index - 1), 1)}</span> por debajo del máximo del ${fdate(now.peak)}. Es lo que ha pasado antes en tu cartera, no una previsión.</p>` : ''}
+    ${cov && cov.low ? '<p class="small muted" style="margin:0">Many older prices of your funds are scattered, not daily: the exact week of each fall may vary slightly.</p>' : ''}
+    ${now ? `<p class="small muted" style="margin:0">You are now <span class="num">${pct(-(res.series[res.series.length - 1].index / res.series[now.peakI].index - 1), 1)}</span> below the high of ${fdate(now.peak)}. This is what has happened before in your portfolio, not a forecast.</p>` : ''}
   </section>`;
 }
-/** Análisis: list under «Caída desde máximos», with a threshold selector. */
+/** Analysis: list under "Drawdown from highs", with a threshold selector. */
 function dropHistory() {
   if (!res || res.series.length < 30) return '';
   const th = ddTh(); const eps = dropEpisodes(th); const cov = priceCoverage(); const since = cov && cov.since;
   const n = eps.reduce((s, e) => s + e.weeks.length, 0);
-  return `<div class="drop-hist" id="dropHist"><div class="panel-h"><h3>Semanas que cayeron más de un ${pct(th, 0)}</h3><div class="seg" role="group" aria-label="Umbral">${DROP_TH.map((t) => `<button type="button" data-ddth="${t}" aria-pressed="${t === th}">${pct(t, 0)}</button>`).join('')}</div></div>
-    ${eps.length ? `<p class="small muted" style="margin:0">${wkLbl(n)} en tu historial; cuánto llegó a caer cada vez desde el máximo anterior y cuánto tardó en volver a él.</p><ul class="drop-list">${eps.slice().reverse().map((e) => epLine(e, since)).join('')}</ul>${cov && cov.low ? '<p class="small muted" style="margin:0">Muchos precios antiguos de tus fondos son sueltos, no diarios: la semana exacta de cada caída puede variar un poco.</p>' : ''}` : `<p class="small muted" style="margin:0">Ninguna semana de tu historial ha caído más de un ${pct(th, 0)}.</p>`}</div>`;
+  return `<div class="drop-hist" id="dropHist"><div class="panel-h"><h3>Weeks that fell more than ${pct(th, 0)}</h3><div class="seg" role="group" aria-label="Threshold">${DROP_TH.map((t) => `<button type="button" data-ddth="${t}" aria-pressed="${t === th}">${pct(t, 0)}</button>`).join('')}</div></div>
+    ${eps.length ? `<p class="small muted" style="margin:0">${wkLbl(n)} in your history; how far it fell each time from the previous high and how long it took to get back to it.</p><ul class="drop-list">${eps.slice().reverse().map((e) => epLine(e, since)).join('')}</ul>${cov && cov.low ? '<p class="small muted" style="margin:0">Many older prices of your funds are scattered, not daily: the exact week of each fall may vary slightly.</p>' : ''}` : `<p class="small muted" style="margin:0">No week in your history has fallen more than ${pct(th, 0)}.</p>`}</div>`;
 }
