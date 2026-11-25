@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Fusiona la estimación de HOY (estim.json de mercado.py) con el documento insights/estimacion del tracker.
+"""Merges TODAY's estimate (estimate.json from market.py) into the tracker's insights/estimacion document.
 
-Uso: python3 -I estimacion.py <estim.json> <documento actual .json o -> <salida .json>
-El documento: {"updated": ISO, "days": {"AAAA-MM-DD": {"us": {"name", "chg", "via"}, ...}}}, con los 10 últimos días.
-La app suma, para cada fondo, los días posteriores a su último valor liquidativo (y deja de mostrarlos cuando llega el dato).
+Usage: python3 -I estimate.py <estimate.json> <current document .json or -> <out .json>
+The document: {"updated": ISO, "days": {"YYYY-MM-DD": {"us": {"name", "chg", "via"}, ...}}}, keeping the last 10 days.
+For each fund, the app adds up the days after its latest NAV (and stops showing them once the NAV arrives).
 """
 import json, sys, datetime
 

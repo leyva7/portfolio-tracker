@@ -1,0 +1,28 @@
+Task: WEEKLY portfolio summary and 3 improvement ideas for the tracker, sent by email. Work without questions; nobody is watching. READ-ONLY on the portfolio: do not write to the database or publish anything.
+
+1. DATA. TODAY = output of: TZ=Europe/Madrid date +%F. Load ToolSearch "select:ArtifactData". With url <ARTIFACT_URL> and out_dir = <your scratchpad>/db: "list" of assets, navs, cash, history, fx and txs (query limit 1000); "get" of jobs/funds, settings/main and insights/claude.
+   python3 -I <REPO_PATH>/routines/email/data.py <scratchpad>/db TODAY <scratchpad>/data.json
+   (do not modify the scripts in <REPO_PATH>/routines/email/; read them only if they fail). Use data.json to understand the week: net worth, market versus your own money, funds, transactions.
+
+2. IMPROVEMENT IDEAS (3):
+- Read <PROJECT_FOLDER>/ideas/backlog.md (if it doesn't exist, create it with the same table) and skim the repository's README and docs/ to know what the tracker already does. If needed, read the HTML with the Artifact tool (action "read") on the url above.
+- Propose 3 new, concrete and useful ideas for THIS week's real use (don't repeat anything in backlog.md, whether proposed, discarded or done). For each one: title, what it would do in 1-2 sentences, why now (tied to the data), effort low/medium/high.
+- Add the 3 to backlog.md with today's date, numbered, with state "proposed" (re-read the file right before writing; don't delete rows).
+Context: <OPTIONAL PERSONAL CONTEXT, e.g. savings goals>. Do not give investment advice.
+
+3. BACKUP: with the data already read, use Python to write <PROJECT_FOLDER>/backups/portfolio-YYYY-MM-DD.json (today's date) in the format the tracker's "Restore backup" accepts: {"version": 1, "exported": "<ISO now>", "assets": [ {"id": <docId>, ...fields} ], "txs": [ {"id": <docId>, ...fields} ], "cash": {<docId>: data}, "navs": {<docId>: data}, "history": {<docId>: data}, "fx": {<docId>: data}, "bench": null, "settings": <settings/main>}. Check that the number of txs and assets matches what you read. Keep only the 8 most recent portfolio-*.json backups in that folder (delete the older ones, nothing else). backlog.md and the backups/ folder are the only things you may modify.
+
+4. THE WEEK IN THE MARKETS (if something fails, carry on without it: the email goes out without that section).
+   a) ToolSearch "select:mcp__Alpha_Vantage_MCP_Server__TIME_SERIES_DAILY,mcp__Alpha_Vantage_MCP_Server__DIGITAL_CURRENCY_DAILY". Call them one at a time, with `sleep 3` (Bash) between calls; if one returns a rate-limit error, wait 10 s and retry it once; if it fails again, skip it.
+      TIME_SERIES_DAILY (datatype csv, outputsize compact) of SPY, EEM, IUSN.DEX and 4GLD.DEX. Save to <scratchpad>/quotes/<symbol>.csv (e.g. quotes/IUSN.DEX.csv) the header and the first 10 rows of the "result" field, copied AS IS (the rest isn't needed).
+      DIGITAL_CURRENCY_DAILY BTC/EUR: write <scratchpad>/quotes/btc.json = {"now": <close of TODAY's row>, "weekAgo": <close of the row from 7 days ago>}. If either row is missing, do not write the file.
+   b) Headlines of the week (WebFetch; always add ?nocache=1 or new articles won't come through):
+      https://www.bolsamania.com/noticias/ultimas/<this week's Friday YYYY-MM-DD>?nocache=1 (Bolsamanía; it usually has the weekly Ibex wrap-up), https://www.bloomberglinea.com/mercados/?nocache=1 (Bloomberg Línea), https://es.investing.com/news/economy?nocache=1 and https://es.investing.com/news/stock-market-news?nocache=1 (Investing.com).
+      Pick 5 headlines from THIS week that sum up what moved global markets (Wall Street, European/Spanish stocks, Fed/ECB, inflation, currencies, commodities, big tech). Rules: at least 2 different sources and at most 2 per source; no technical analysis, buy/sell recommendations, "why stock X is up/down" or local Latin American news; no repeated topics. Verbatim title and the article's full URL. Write <scratchpad>/headlines.json = [{"title","source","url"}, ...] (source: "Bolsamanía", "Bloomberg Línea" or "Investing.com"); if there are no reliable headlines, [].
+   c) python3 -I <REPO_PATH>/routines/email/market_week.py <scratchpad>/data.json <scratchpad>/db TODAY <scratchpad>/quotes <scratchpad>/headlines.json <scratchpad>/market-week.json
+
+5. EMAIL. Write <scratchpad>/extras.json: {"ideas": [{"n": <number in the backlog>, "title": "...", "what": "...", "why": "...", "effort": "low|medium|high"} ×3], "backup": "Backup saved: backups/portfolio-YYYY-MM-DD.json (<N> transactions)." (or "The backup failed: <reason>."), "notes": [only if something in the data looks wrong and should be known, one line per item; otherwise an empty list]}. Then:
+   python3 -I <REPO_PATH>/routines/email/weekly.py <scratchpad>/data.json <scratchpad>/email.html <scratchpad>/extras.json <scratchpad>/market-week.json
+   Load ToolSearch "select:mcp__Gmail__send_message" and send ONE email to <YOUR_EMAIL> with subject = contents of email.subject, htmlBody = the EXACT contents of email.html (as is, without summarizing or rewriting) and body = contents of email.txt.
+   If a script fails, still send a simple plain-text email with whatever you have (net worth, ideas, backup) and the line "The visual summary failed: <error>". If Gmail fails, say so in your final message.
+Never make up figures or headlines. Do not give investment advice. Your final message: the subject, the 3 ideas, whether the backup was made, which quotes or sources failed and whether the email was sent.

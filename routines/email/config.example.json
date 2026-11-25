@@ -1,0 +1,8 @@
+{
+  "trackerUrl": "https://claude.ai/artifact/<YOUR-ARTIFACT-ID>",
+  "funds": [
+    {"id": "<asset-id-of-your-sp500-fund>", "short": "S&P 500 fund", "index": "S&P 500", "symbol": "SPY", "usd": true},
+    {"id": "<asset-id-of-your-emerging-fund>", "short": "Emerging fund", "index": "Emerging markets", "symbol": "EEM", "usd": true},
+    {"id": "<asset-id-of-your-small-cap-fund>", "short": "Small cap fund", "index": "Global small caps", "symbol": "IUSN.DEX", "usd": false}
+  ]
+}

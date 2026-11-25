@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-"""Calcula los datos de los correos de la cartera a partir de la base de datos del tracker.
+"""Computes the data for the portfolio emails from the tracker's database.
 
-Uso: python3 -I datos.py <carpeta_db> <HOY AAAA-MM-DD> <salida.json>
-<carpeta_db> es el out_dir de ArtifactData con subcarpetas assets/, navs/, txs/, cash/ y,
-si existen, jobs/funds.json y settings/main.json (cada documento en <col>/<id>.json).
+Usage: python3 -I data.py <db_folder> <TODAY YYYY-MM-DD> <out.json>
+<db_folder> is the ArtifactData out_dir with subfolders assets/, navs/, txs/, cash/ and,
+if present, jobs/funds.json and settings/main.json (each document in <collection>/<id>.json).
 
-Todo sale de la base de datos; nada se inventa. El "mercado" de cada día es exacto:
-  mercado_d = invertido_d − invertido_(d−1) − (compras_d − ventas_d)   (a precio de la operación)
-  tu dinero_d = cambio total_d − mercado_d  (aportaciones, retiradas, intereses, comisiones)
+Everything comes from the database; nothing is made up. Each day's "market" effect is exact:
+  market_d = invested_d − invested_(d−1) − (buys_d − sells_d)   (at the trade price)
+  your_money_d = total change_d − market_d  (deposits, withdrawals, interest, fees)
 """
 import json, glob, os, re, sys, datetime as dt
 
-DB, HOY, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
+DB, TODAY, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
 
 def _config():
-    """Lee config.json (junto a este script; no se versiona) o, si no existe, config.example.json."""
+    """Reads config.json (next to this script; not versioned) or, if missing, config.example.json."""
     base = os.path.dirname(os.path.abspath(__file__))
     for n in ("config.json", "config.example.json"):
         p = os.path.join(base, n)
@@ -26,10 +26,10 @@ def _config():
 
 CFG = _config()
 URL = CFG.get("trackerUrl", "")
-CORTOS = {f["id"]: f["corto"] for f in CFG.get("fondos", [])}
-DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
-MESES_L = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
-           "septiembre", "octubre", "noviembre", "diciembre"]
+SHORT_NAMES = {f["id"]: f["short"] for f in CFG.get("funds", [])}
+DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
+          "September", "October", "November", "December"]
 
 
 def load(p):
@@ -51,12 +51,12 @@ assets, navs, txs, cash = col("assets"), {k: v.get("m", {}) for k, v in col("nav
 settings, job = opt("settings", "main"), opt("jobs", "funds")
 fx = navs.get("fx-USD", {})
 D = lambda s: dt.date.fromisoformat(s)
-hoy = D(HOY)
+today = D(TODAY)
 
 
-def corto(a):
-    if a in CORTOS:
-        return CORTOS[a]
+def short_name(a):
+    if a in SHORT_NAMES:
+        return SHORT_NAMES[a]
     n = assets.get(a, {}).get("name", a)
     n = re.sub(r"\b(Index|Fund|UCITS|ETF|ETC|\(IE\)|\(Acc\)|Acc|EUR|S|P-Acc-EUR|I)\b", "", n)
     return re.sub(r"\s+", " ", n).strip()[:24]
@@ -105,7 +105,7 @@ def cash_at(d):
 
 
 def flow(d):
-    """Dinero que entra en inversiones ese día (compras − ventas, a precio de la operación)."""
+    """Money going into investments that day (buys − sells, at the trade price)."""
     f = 0.0
     for t in txs:
         if t["date"] != d or t["type"] not in ("buy", "sell"):
@@ -124,14 +124,14 @@ def busdays(a, b):
     return out
 
 
-# ---- serie diaria (días laborables de los últimos 30 días + el anterior como base) ----
-dias = busdays(hoy - dt.timedelta(days=30), hoy)
-prev = (D(dias[0]) - dt.timedelta(days=1))
+# ---- daily series (business days of the last 30 days, plus the one before as the base) ----
+days = busdays(today - dt.timedelta(days=30), today)
+prev = (D(days[0]) - dt.timedelta(days=1))
 while prev.weekday() >= 5:
     prev -= dt.timedelta(days=1)
-dias = [prev.isoformat()] + dias
+days = [prev.isoformat()] + days
 series = []
-for d in dias:
+for d in days:
     v = values(d)
     inv, cs = round(sum(v.values()), 2), round(cash_at(d), 2)
     series.append({"date": d, "invested": inv, "cash": cs, "total": round(inv + cs, 2)})
@@ -141,102 +141,102 @@ for a, b in zip(series, series[1:]):
     b["yourMoney"] = round(b["total"] - a["total"] - b["market"], 2)
     b["flow"] = abs(b["yourMoney"]) >= 0.5 or abs(fl) >= 0.5 or abs(b["cash"] - a["cash"]) >= 0.5
     b["pct"] = round(b["market"] / a["total"] * 100, 3) if a["total"] else 0
-series = series[1:]  # el primer punto ya es el primer día del periodo, con su mercado calculado
+series = series[1:]  # the first point is now the first day of the period, with its market effect computed
 base_total = series[0]["total"] - series[0]["market"] - series[0]["yourMoney"]
 t, y = series[-1], series[-2]
 
-# ---- posiciones ----
-mes_ref = (hoy - dt.timedelta(days=30)).isoformat()
+# ---- positions ----
+month_ref = (today - dt.timedelta(days=30)).isoformat()
 positions = []
-for a, val in sorted(values(HOY).items(), key=lambda z: -z[1]):
+for a, val in sorted(values(TODAY).items(), key=lambda z: -z[1]):
     m = navs.get(a, {})
-    ks = sorted(k for k in m if k <= HOY)
+    ks = sorted(k for k in m if k <= TODAY)
     if len(ks) < 2:
         continue
-    old = [k for k in ks if k <= mes_ref]
-    positions.append({"id": a, "name": assets.get(a, {}).get("name", a), "short": corto(a),
+    old = [k for k in ks if k <= month_ref]
+    positions.append({"id": a, "name": assets.get(a, {}).get("name", a), "short": short_name(a),
                       "class": assets.get(a, {}).get("cls"), "value": round(val, 2),
                       "chgLast": round((m[ks[-1]] / m[ks[-2]] - 1) * 100, 2),
                       "chg1m": round((m[ks[-1]] / m[old[-1]] - 1) * 100, 2) if old else None,
                       "lastPriceDate": ks[-1]})
 b = navs.get("bench", {})
-bk = sorted(k for k in b if k <= HOY)
-bo = [k for k in bk if k <= mes_ref]
-index = {"name": settings.get("benchName", "Índice").replace(" (EUR)", ""),
+bk = sorted(k for k in b if k <= TODAY)
+bo = [k for k in bk if k <= month_ref]
+index = {"name": settings.get("benchName", "Index").replace(" (EUR)", ""),
          "chgLast": round((b[bk[-1]] / b[bk[-2]] - 1) * 100, 2) if len(bk) > 1 else None,
          "chg1m": round((b[bk[-1]] / b[bo[-1]] - 1) * 100, 2) if bo else None}
 
-# ---- operaciones y movimientos de un periodo ----
-def ops(desde, hasta):
+# ---- trades and cash movements in a period ----
+def ops(start, end):
     out = []
     for x in sorted(txs, key=lambda x: x["date"]):
-        if desde <= x["date"] <= hasta and x["type"] in ("buy", "sell", "transfer"):
-            out.append({"date": x["date"], "type": x["type"], "asset": corto(x["assetId"]) if x.get("assetId") else "",
+        if start <= x["date"] <= end and x["type"] in ("buy", "sell", "transfer"):
+            out.append({"date": x["date"], "type": x["type"], "asset": short_name(x["assetId"]) if x.get("assetId") else "",
                         "amount": round(x["qty"] * x["price"] * (x.get("fx") or 1), 2)})
     linked = {x["cashMv"]["mv"] for x in txs if isinstance(x.get("cashMv"), dict)}
     for c in cash:
         for k, m in (c.get("mv") or {}).items():
-            if desde <= m["d"] <= hasta and m["t"] in ("in", "out", "interest") and k not in linked \
-                    and not re.match(r"(?i)^venta\b", m.get("n") or ""):
+            if start <= m["d"] <= end and m["t"] in ("in", "out", "interest") and k not in linked \
+                    and not re.match(r"(?i)^(venta|sale)\b", m.get("n") or ""):
                 tp = {"in": "deposit", "out": "withdrawal", "interest": "interest"}[m["t"]]
-                out.append({"date": m["d"], "type": tp, "asset": c.get("name", "Efectivo"),
+                out.append({"date": m["d"], "type": tp, "asset": c.get("name", "Cash"),
                             "amount": round(abs(m["a"]), 2), "note": m.get("n") or ""})
     return out
 
 
-# ---- avisos (solo problemas reales; nunca fechas de precio) ----
+# ---- alerts (real problems only; never price dates) ----
 alerts = []
 if job:
     if job.get("state") == "error":
-        alerts.append("La tarea de precios terminó con error: " + str(job.get("error") or "sin detalle") + ".")
+        alerts.append("The price task ended with an error: " + str(job.get("error") or "no details") + ".")
     for r in job.get("results") or []:
         if r.get("ok") is False:
-            alerts.append(f"No se pudo actualizar el precio de {corto(r.get('assetId', '?'))}.")
+            alerts.append(f"Could not update the price of {short_name(r.get('assetId', '?'))}.")
     fin = (job.get("finishedAt") or "")[:10]
-    if fin and fin < (hoy - dt.timedelta(days=1)).isoformat():
-        alerts.append(f"La tarea de precios no se ejecuta desde el {int(fin[8:])} de {MESES_L[int(fin[5:7]) - 1]}.")
+    if fin and fin < (today - dt.timedelta(days=1)).isoformat():
+        alerts.append(f"The price task has not run since {MONTHS[int(fin[5:7]) - 1]} {int(fin[8:])}.")
 for p in positions:
-    if len(busdays(D(p["lastPriceDate"]) + dt.timedelta(days=1), hoy)) > 5:
-        alerts.append(f"{p['short']} lleva más de 5 días laborables sin precio nuevo.")
-# descuadre ventas/efectivo (misma regla que la app)
+    if len(busdays(D(p["lastPriceDate"]) + dt.timedelta(days=1), today)) > 5:
+        alerts.append(f"{p['short']} has had no new price for more than 5 business days.")
+# sales vs cash mismatch (same rule as the app)
 linked = {x["cashMv"]["mv"] for x in txs if isinstance(x.get("cashMv"), dict)}
 allmv = [(k, m) for c in cash for k, m in (c.get("mv") or {}).items()]
-sale_mv = [(k, m) for k, m in allmv if m["a"] > 0 and (k in linked or re.match(r"(?i)^venta\b", m.get("n") or ""))]
+sale_mv = [(k, m) for k, m in allmv if m["a"] > 0 and (k in linked or re.match(r"(?i)^(venta|sale)\b", m.get("n") or ""))]
 if sale_mv:
     first = min(m["d"] for _, m in sale_mv)
-    desde = max((D(first) - dt.timedelta(days=5)).isoformat(), (hoy - dt.timedelta(days=90)).isoformat())
+    since = max((D(first) - dt.timedelta(days=5)).isoformat(), (today - dt.timedelta(days=90)).isoformat())
     got = sum(x["qty"] * x["price"] * (x.get("fx") or 1) - (x.get("fees") or 0) for x in txs
-              if x["type"] == "sell" and x["date"] >= desde and x.get("note") != "Cierre de resto"
+              if x["type"] == "sell" and x["date"] >= since and x.get("note") != "Cierre de resto"
               and not (x["qty"] * x["price"] < 5 and not x.get("cashMv")))
-    inc = sum(m["a"] for _, m in sale_mv if m["d"] >= desde) + sum(m["a"] for _, m in allmv if m["t"] == "adjust" and m["d"] >= desde)
+    inc = sum(m["a"] for _, m in sale_mv if m["d"] >= since) + sum(m["a"] for _, m in allmv if m["t"] == "adjust" and m["d"] >= since)
     if got and abs(inc - got) >= 1:
-        alerts.append(f"Ventas y efectivo no cuadran por {abs(inc - got):.2f} €".replace(".", ",") + " desde el " + desde + ".")
+        alerts.append(f"Sales and cash are off by €{abs(inc - got):,.2f} since {since}.")
 
 goal = settings.get("goal") or None
-mes = series
+month = series
 out = {
-    "date": HOY, "dayLabel": f"{DIAS[hoy.weekday()]} {hoy.day} de {MESES_L[hoy.month - 1]}",
+    "date": TODAY, "dayLabel": f"{DAYS[today.weekday()]}, {MONTHS[today.month - 1]} {today.day}",
     "total": t["total"], "invested": t["invested"], "cash": t["cash"],
     "change": {"eur": round(t["total"] - y["total"], 2), "pct": round((t["total"] / y["total"] - 1) * 100, 2),
                "yourMoney": t["yourMoney"], "market": t["market"]},
     "month": {"from": series[0]["date"], "base": round(base_total, 2), "eur": round(t["total"] - base_total, 2),
-              "market": round(sum(s["market"] for s in mes), 2), "yourMoney": round(sum(s["yourMoney"] for s in mes), 2)},
+              "market": round(sum(s["market"] for s in month), 2), "yourMoney": round(sum(s["yourMoney"] for s in month), 2)},
     "series": series, "positions": positions, "index": index,
-    "todayOps": ops(HOY, HOY), "savingsGoal": goal, "alerts": alerts, "trackerUrl": URL,
-    # parte de lo invertido que ya tiene precio de HOY. Los fondos publican su precio al día siguiente,
-    # así que a la hora del correo suele ser ~0: el mercado de hoy aún no se conoce (no es 0 €).
-    "pricedToday": round(sum(p["value"] for p in positions if p["lastPriceDate"] == HOY)
+    "todayOps": ops(TODAY, TODAY), "savingsGoal": goal, "alerts": alerts, "trackerUrl": URL,
+    # share of the invested value that already has TODAY's price. Funds publish their price the next day,
+    # so at email time this is usually ~0: today's market effect is not known yet (it is not €0).
+    "pricedToday": round(sum(p["value"] for p in positions if p["lastPriceDate"] == TODAY)
                          / (sum(p["value"] for p in positions) or 1), 3),
 }
-# semana (para el resumen semanal): últimos 7 días naturales
-w0 = (hoy - dt.timedelta(days=6)).isoformat()
+# week (for the weekly summary): last 7 calendar days
+w0 = (today - dt.timedelta(days=6)).isoformat()
 ws = [s for s in series if s["date"] >= w0]
 if ws:
     prevw = [s for s in series if s["date"] < w0]
     wb = prevw[-1]["total"] if prevw else ws[0]["total"] - ws[0]["market"] - ws[0]["yourMoney"]
     out["week"] = {"from": w0, "eur": round(t["total"] - wb, 2), "pct": round((t["total"] / wb - 1) * 100, 2),
                    "market": round(sum(s["market"] for s in ws), 2), "yourMoney": round(sum(s["yourMoney"] for s in ws), 2),
-                   "ops": ops(w0, HOY)}
+                   "ops": ops(w0, TODAY)}
 with open(OUT, "w", encoding="utf-8") as f:
     json.dump(out, f, ensure_ascii=False, indent=1)
 print(json.dumps({k: out[k] for k in ("dayLabel", "total", "change", "month", "alerts")}, ensure_ascii=False))

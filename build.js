@@ -9,7 +9,7 @@ const app = (dir, names) => names.map((n) => `js/app/${dir}/${n}.js`);
 // Order = order in the page. Strings starting with '<' are literal markup; the rest are files under src/.
 const PARTS = [
   'head.html',
-  ...style('<style>\n', ['base', 'header-nav', 'components', 'forms', 'tiles', 'mobile', 'polish', 'mobile-v21', 'calma', 'secciones'].map((n) => `styles/${n}.css`)),
+  ...style('<style>\n', ['base', 'header-nav', 'components', 'forms', 'tiles', 'mobile', 'polish', 'mobile-v21', 'calm-theme', 'sections'].map((n) => `styles/${n}.css`)),
   'body.html',
   ...style('<style id="anim">\n', ['styles/motion.css']),
   ...script(['js/motion.js']),
@@ -19,8 +19,8 @@ const PARTS = [
   ...script([
     ...app('core', ['config', 'format', 'state', 'demo', 'capabilities', 'prices']),
     'js/app/ui/charts.js', 'js/app/core/periods.js', 'js/app/ui/header.js', 'js/app/core/patrimony.js',
-    ...app('tabs', ['insights', 'resumen', 'efectivo', 'resumen-claude', 'posiciones', 'operaciones', 'analisis', 'eficiencia', 'analista', 'zonas', 'caidas', 'estimacion', 'proyeccion', 'fiscal', 'activos', 'mapa', 'secciones']),
-    ...app('modals', ['forms', 'ficha']),
+    ...app('tabs', ['insights', 'summary', 'cash', 'claude-analysis', 'positions', 'transactions', 'analysis', 'efficiency', 'analyst', 'regions', 'drawdowns', 'estimate', 'projection', 'taxes', 'assets', 'world-map', 'sections']),
+    ...app('modals', ['forms', 'asset-detail']),
     ...app('import', ['import', 'myinvestor']),
     ...app('data', ['quality', 'safety']),
     'js/app/ui/mobile-nav.js', 'js/app/modals/sheets.js', 'js/app/modals/recurring.js', 'js/app/tabs/rebalance.js',
