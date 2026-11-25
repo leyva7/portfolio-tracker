@@ -1,0 +1,149 @@
+/* ===== Secciones (v3): Inicio, Cartera, Análisis, Plan ===== */
+.col-stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.since{display:inline-block;font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:1px 8px;vertical-align:2px;white-space:nowrap}
+h2 .since{margin-left:4px}
+/* Back link of the detail views (Efectivo, Movimientos, Impuestos, Ajustes) */
+.backlink{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;font-size:15px;font-weight:700;color:var(--accent);text-decoration:none;padding:6px 2px;min-height:44px}
+.backlink svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.backlink:hover{text-decoration:underline}
+/* Para revisar */
+.rv-list{display:flex;flex-direction:column}
+.rv-i{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.rv-list .rv-i:first-child{border-top:0;padding-top:0}
+.rv-tag{flex:0 0 auto;min-width:64px;text-align:center;font-size:12px;font-weight:700;color:var(--muted);background:var(--surface-2);border-radius:99px;padding:3px 8px}
+.rv-b{flex:1;min-width:0}
+.rv-t{font-size:15px;font-weight:700;line-height:1.35}
+.rv-b .small{line-height:1.45}
+.rv-i>a,.rv-i>.btn{flex:0 0 auto}
+.rv-more summary{font-size:13px;color:var(--muted);cursor:pointer;padding-top:4px}
+.rv-more .rv-list{margin-top:8px}
+.rv-more .rv-list .rv-i:first-child{border-top:1px solid var(--line);padding-top:10px}
+/* Footer rows */
+.pos-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px}
+/* Reparto */
+#repPanel .seg{align-self:flex-start}
+.rep-body{display:flex;flex-direction:column;gap:12px}
+.rep-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.seg-sm button{font-size:13px;padding:4px 10px}
+.rep-tgt{border-top:1px solid var(--line);padding-top:12px}
+.tp-row.alink{display:grid;width:100%;box-sizing:border-box;padding:2px 0}
+.tp-bar{position:relative}
+.tp-tgt{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);border-radius:1px;transform:translateX(-1px)}
+.tp-w{text-align:right}.tp-w small{display:block;font-size:12px}
+#repPanel .tp-bar{overflow:visible}
+/* World map */
+.zmap{margin:0;display:flex;flex-direction:column;gap:10px}
+.zmap svg{width:100%;height:auto;display:block}
+.zm-rest{fill:var(--ink);fill-opacity:.07;stroke:var(--surface);stroke-width:.6}
+.zm-z{fill:var(--accent);stroke:var(--surface);stroke-width:.8}
+.zm-z:hover{stroke:var(--ink);stroke-width:1.4}
+.zm-lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 14px}
+.zm-li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;column-gap:8px;align-items:baseline;font-size:13px}
+.zm-li i{width:12px;height:12px;border-radius:3px;background:var(--accent);align-self:center}
+.zm-li .zm-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zm-li .small{grid-column:2 / 4}
+/* Efectivo and Movimientos cards in Cartera */
+.cc-tot{font-size:22px}
+.cc-list{display:flex;flex-direction:column}
+.cc-row{display:flex;align-items:center;gap:12px;padding:8px 0;color:inherit;text-decoration:none;min-height:44px}
+.cc-row:hover .cc-b b{text-decoration:underline}
+.cc-ic{flex:0 0 36px;height:36px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700}
+.cc-b{flex:1;min-width:0;display:flex;flex-direction:column}
+.cc-row .chev,.mv-r .chev{width:16px;height:16px;fill:none;stroke:var(--muted);stroke-width:2;flex:0 0 auto}
+.mv-list{display:flex;flex-direction:column}
+.mv-r{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.mv-list .mv-r:first-child{border-top:0;padding-top:0}
+.mv-l{min-width:0}.mv-l small{display:block;font-size:13px;color:var(--muted)}
+.mv-r>.num{white-space:nowrap;font-weight:700}
+.pos-foot .btn{min-height:36px}
+.cashsw{background:var(--accent-soft);border:1px solid var(--accent)}
+/* Análisis */
+.an-top{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap}
+.an-more summary{font-size:13px;color:var(--muted);cursor:pointer}
+.an-more .stats{margin-top:8px}
+.idx-euros{font-size:13px;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:10px}
+.idx-euros b{color:var(--ink)}
+/* Plan */
+.pj-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.pj-chips .chip{font-weight:500;background:var(--surface-2);color:var(--ink)}
+@media (max-width:560px){.rv-tag{min-width:0}.cc-tot{font-size:17px}.zm-lg{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+/* Movimientos (escritorio): la nota se parte en líneas para que la tabla quepa sin desbordar la página */
+.txtbl td:nth-child(9){white-space:normal;min-width:90px;max-width:170px;font-size:13px;line-height:1.35}
+.txtbl tr.cashrow td:nth-child(3){white-space:nowrap}
+.txtbl .rowact{flex-wrap:wrap;justify-content:flex-end}
+.txtbl td:last-child{white-space:normal;width:1%}.txtbl td:last-child .rowact{min-width:0;max-width:150px}.txtbl td:nth-child(3){max-width:190px;white-space:normal}
+@media (min-width:901px){.txtbl th,.txtbl td{padding-left:6px;padding-right:6px}.txtbl td:nth-child(9){min-width:70px}}
+/* Toques de al menos 44 px en los enlaces y botones pequeños de las secciones */
+.pos-foot a,.pos-foot .btn,.rv-i>a,.rv-i>.btn{display:inline-flex;align-items:center;min-height:44px;min-width:44px}
+.rv-i>a{justify-content:flex-end}
+.mcard .tk.tkc{white-space:normal;overflow:visible;text-overflow:clip}
+/* Revisión 1 de la implementación */
+.heat th:first-child{position:sticky;left:0;z-index:2;background:var(--surface);box-shadow:6px 0 6px -6px rgba(0,0,0,.18)}
+.heat th:first-child::before{content:"";position:absolute;top:-2px;bottom:-2px;right:100%;width:18px;background:var(--surface)}
+.heat thead th:first-child{background:var(--surface)}
+.rv-solo{border:0;padding:0}
+#dropPanel{padding-top:16px;padding-bottom:16px}
+.zm-z{cursor:pointer}.zm-z.on{stroke:var(--ink);stroke-width:1.6}
+.zm-rest{fill-opacity:.09}
+#zmInfo{margin:0;min-height:1.5em}
+.zmap>.seg{align-self:flex-start;width:auto}
+.g-2e:has(>section[hidden]){grid-template-columns:minmax(0,1fr)}
+/* Plan: la proyección que suma */
+#pjTiles{grid-template-columns:minmax(0,1fr)}
+.pj-sum{display:flex;flex-direction:column;gap:14px}
+.pj-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.pj-top>div{display:flex;flex-direction:column;gap:2px}
+.pj-big{font-size:40px!important;line-height:1.1}
+.pj-rng{text-align:right}.pj-rng b{font-size:17px}
+.pj-eqbar{display:flex;gap:3px;height:12px}.pj-eqbar i{border-radius:99px;display:block}
+.pj-eq{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:start}
+.pj-eq>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pj-eq b{font-size:17px}.pj-eq .op{font-size:22px;color:var(--muted);align-self:center}
+.pj-eq .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+@media (max-width:560px){.pj-big{font-size:32px!important}.pj-eq b{font-size:15px}.pj-rng{text-align:left}}
+/* Escritorio: tablas que caben y la tarjeta del patrimonio solo en Inicio */
+@media (min-width:1024px){
+  body[data-tab]:not([data-tab="resumen"]) .top .brand{display:none}
+  .postbl th,.postbl td{padding-left:6px;padding-right:6px}
+  .postbl .asset-cell .nm{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+.postbl.nodiv th:nth-child(10),.postbl.nodiv td:nth-child(10){display:none}
+@media (min-width:1024px){
+  .postbl td .small{white-space:normal;max-width:110px;margin-left:auto}
+  .postbl td .rowact,.acttbl td .rowact{flex-wrap:wrap;justify-content:flex-end;max-width:120px;margin-left:auto}
+  .acttbl th,.acttbl td{padding-left:6px;padding-right:6px}
+  .acttbl td{white-space:normal}
+  .acttbl td:nth-child(8){max-width:150px}
+  .txtbl td:nth-child(9){max-width:100px}
+  .txtbl td:nth-child(3){max-width:140px}
+}
+@media (min-width:1024px){.postbl thead th{white-space:normal;vertical-align:bottom}.postbl .asset-cell .nm{max-width:120px}}
+/* Ronda 3 */
+.pj-cash{margin:0;font-size:13px;font-weight:600;color:var(--ink);background:var(--surface-2);border-radius:10px;padding:8px 12px}
+.zm-li .zm-n{white-space:normal;overflow:visible;text-overflow:clip}
+#taxPanel .stats+.pos-foot{border-top:0;padding-top:4px}
+#taxPanel .stats .stat:last-child{border-bottom:1px solid var(--line)}
+.pown{white-space:nowrap}
+.ai-old{margin:8px 0 0}
+@media (max-width:560px){
+  .pj-eq{grid-template-columns:minmax(0,1fr);gap:8px}
+  .pj-eq .op{display:none}
+  .pj-eq>div{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;align-items:baseline}
+  .pj-eq>div .s{grid-column:1 / 3}
+  .pj-eq>div:last-child{border-top:1.5px solid var(--ink);padding-top:8px}
+}
+#idxPanel,#riskPanel,#mesPanel{scroll-margin-top:76px}
+/* Ronda 4 */
+.pdate{white-space:nowrap!important;max-width:none!important}
+.pown{color:var(--accent);font-weight:700;margin-left:2px;cursor:help}
+.heatv{width:100%}
+.heatv td.cell{min-width:0}
+.heatv th:first-child{text-align:left;width:44px}
+.heatv tr.yr th,.heatv tr.yr td{border-top-width:8px}
+.idx-lead{margin:0 0 8px;font-size:15px;line-height:1.45}.idx-lead b{font-size:17px}
+/* Ronda 9 */
+#modal .panel-h{flex-wrap:nowrap;align-items:flex-start}
+#modal .panel-h h2{flex:1;min-width:0}
+#modal .panel-h>[data-close]{flex:0 0 auto}
+.lots-more summary{cursor:pointer;color:var(--accent);font-weight:600}
+@media (min-width:1024px){.postbl .asset-cell .nm{max-width:190px;white-space:normal;overflow:visible;text-overflow:clip}}

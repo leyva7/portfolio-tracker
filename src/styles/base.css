@@ -1,0 +1,58 @@
+:root{
+  --bg:#f3f0ea; --surface:#ffffff; --surface-2:#ece8e0; --ink:#1e1c19; --ink-2:#4a453e; --muted:#655f56;
+  --line:#e6e1d8; --grid:#eeeae3; --accent:#1f3a68; --accent-ink:#ffffff; --accent-soft:#e4e9f2;
+  --gain:#2c7350; --loss:#a9443a; --gain-soft:#e3efe7; --loss-soft:#f5e4e1; --warn:#5e564b; --warn-bg:#ece8e0;
+  --gain-fill:#2c7350; --chart-base:#a39c90; --bar:rgba(255,255,255,.86);
+  --s1:#1f3a68; --s2:#a39c90; --s3:#6f8dbf; --s4:#b49a6a; --s5:#8a6c58; --s6:#4c6a9c; --s7:#c9c2b6; --s8:#9fb3d6; --s9:#7d776d;
+  --div-neg:#a9443a; --div-mid:#ece8e0; --div-pos:#2c7350; --cor-neg:#1f3a68; --cor-pos:#a9443a;
+  --f-ui:Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-display:Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:20px; --shadow:0 1px 2px rgba(40,32,20,.06),0 4px 16px rgba(40,32,20,.05); --elev:0 1px 2px rgba(40,32,20,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#181715; --surface:#23211e; --surface-2:#2d2b27; --ink:#efebe4; --ink-2:#cfc8bd; --muted:#a9a296;
+    --line:#34312c; --grid:#2b2925; --accent:#9db4de; --accent-ink:#14213a; --accent-soft:#2b3240;
+    --gain:#86ae95; --loss:#db958a; --gain-soft:#2d2b27; --loss-soft:#2d2b27; --warn:#cfc8bd; --warn-bg:#2d2b27;
+    --gain-fill:#7f9cca; --chart-base:#7d776d; --bar:rgba(35,33,30,.88);
+    --s1:#9db4de; --s2:#8f887c; --s3:#5f7fb5; --s4:#b59e72; --s5:#a08470; --s6:#7894c4; --s7:#5a554d; --s8:#c3d1ea; --s9:#6e685f;
+    --div-neg:#db958a; --div-mid:#2d2b27; --div-pos:#7f9cca; --cor-neg:#9db4de; --cor-pos:#db958a;
+    --shadow:0 1px 2px rgba(0,0,0,.3); --elev:none;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#181715; --surface:#23211e; --surface-2:#2d2b27; --ink:#efebe4; --ink-2:#cfc8bd; --muted:#a9a296;
+  --line:#34312c; --grid:#2b2925; --accent:#9db4de; --accent-ink:#14213a; --accent-soft:#2b3240;
+  --gain:#86ae95; --loss:#db958a; --gain-soft:#2d2b27; --loss-soft:#2d2b27; --warn:#cfc8bd; --warn-bg:#2d2b27;
+  --gain-fill:#7f9cca; --chart-base:#7d776d; --bar:rgba(35,33,30,.88);
+  --s1:#9db4de; --s2:#8f887c; --s3:#5f7fb5; --s4:#b59e72; --s5:#a08470; --s6:#7894c4; --s7:#5a554d; --s8:#c3d1ea; --s9:#6e685f;
+  --div-neg:#db958a; --div-mid:#2d2b27; --div-pos:#7f9cca; --cor-neg:#9db4de; --cor-pos:#db958a;
+  --shadow:0 1px 2px rgba(0,0,0,.3); --elev:none;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-ui);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;line-height:1.45;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:1240px;margin:0 auto}
+.num,td.n,th.n{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em;font-weight:700}
+h2{font-size:15px;font-weight:700}
+h3{font-size:13px;font-weight:700;font-family:var(--f-ui)}
+.eyebrow{font-size:13px;color:var(--muted);font-weight:500}
+.muted{color:var(--muted)} .small{font-size:13px}
+.gain{color:var(--gain)} .loss{color:var(--loss)}
+b,strong{font-weight:700}
+/* Calma: every gain carries ▲ and every loss ▼, drawn in CSS with the colour of the figure (no glyph, no extra font) */
+.gain::before,.loss::before{content:"";display:inline-block;width:0;height:0;border-left:.27em solid transparent;border-right:.27em solid transparent;margin-right:.28em}
+.gain::before{border-bottom:.46em solid currentColor;vertical-align:.12em}
+.loss::before{border-top:.46em solid currentColor;vertical-align:.1em}
+.noarr::before{content:none!important}
+/* iPhone v31: the arrow and its figure never part. A signed figure does not wrap; a coloured label that only tints (noarr) wraps as usual */
+.gain,.loss{white-space:nowrap}
+.gain.noarr,.loss.noarr{white-space:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+

@@ -1,0 +1,81 @@
+/* Motion: transform/opacity only; colours and sizes stay with the main stylesheet */
+@keyframes mIn{from{opacity:0;transform:translate3d(var(--mdx,0px),var(--mdy,8px),0)}}
+@keyframes mFade{from{opacity:0}}
+@keyframes mFadeOut{to{opacity:0}}
+@keyframes mPop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+@keyframes mPopOut{to{opacity:0;transform:translateY(6px) scale(.98)}}
+@keyframes mSheet{from{transform:translateY(100%)}}
+@keyframes mSheetOut{to{transform:translateY(100%)}}
+@keyframes mToast{from{opacity:0;transform:translate(-50%,12px) scale(.97)}}
+@keyframes mSpin{to{transform:rotate(360deg)}}
+@keyframes mPulse{50%{opacity:.45}}
+@keyframes mBump{40%{transform:scale(.84)}75%{transform:scale(1.08)}}
+.m-enter>*,.m-enter .tiles>*,.m-enter .kpis>*{animation:mIn .42s cubic-bezier(.2,.75,.25,1) backwards;animation-delay:calc(var(--mi,0)*45ms)}
+.m-enter .tiles>*,.m-enter .kpis>*{--mdx:0px;--mdy:6px}
+.btn,.seg button,.fchip,.typepick button,.sheet-list button,.toast-act,.thsort,.hint-btn{transition:transform .12s ease,background-color .15s,border-color .15s,box-shadow .15s,color .15s,filter .15s}
+.btn:active:not(:disabled),.fchip:active,.typepick button:active,.toast-act:active{transform:scale(.96)}
+.seg button:active:not(:disabled){transform:scale(.94)}
+.sheet-list button:active{transform:scale(.98)}
+tbody td{transition:background-color .12s}
+#btnRefresh:disabled svg{animation:mSpin .9s linear infinite}
+#btnTheme svg{transition:transform .35s cubic-bezier(.2,.75,.25,1)}
+#btnTheme:active svg{transform:rotate(-30deg) scale(.9)}
+nav.tabs .m-ink{position:absolute;left:0;bottom:0;width:100px;height:2px;border-radius:2px;background:var(--accent);transform-origin:0 0;pointer-events:none;transition:transform .32s cubic-bezier(.2,.75,.25,1)}
+nav.tabs.m-ink-on button[aria-selected="true"]{border-bottom-color:transparent}
+nav.tabs button{transition:color .2s}
+.bnav button svg{transition:transform .15s ease}
+.bnav button:active svg{transform:scale(.86)}
+.bnav button[aria-current="page"] svg{animation:mBump .38s ease-out}
+.bnav .bplus .circ{transition:transform .15s ease}
+.bnav .bplus:active .circ{transform:scale(.9)}
+.bnav .bplus .circ svg{transition:transform .25s cubic-bezier(.2,.75,.25,1)}
+body:has(#overlay:not([hidden])) .bnav .bplus .circ svg{transform:rotate(45deg)}
+.overlay:not([hidden]){animation:mFade .18s ease-out}
+.modal{animation:mPop .22s cubic-bezier(.2,.75,.25,1)}
+.overlay.m-ghost{z-index:49;pointer-events:none;animation:mFadeOut .18s ease-in forwards}
+.overlay.m-ghost .modal{animation:mPopOut .18s ease-in forwards}
+.toast:not([hidden]){animation:mToast .26s cubic-bezier(.2,.75,.25,1)}
+details.mcard[open]>.mc-body,details.ls-more[open]>:not(summary),details[open]>.explain{animation:mIn .24s ease-out;--mdy:-4px}
+@media (max-width:640px){
+  .modal{animation:mSheet .3s cubic-bezier(.2,.8,.2,1)}
+  .overlay.m-ghost .modal{animation:mSheetOut .22s cubic-bezier(.4,0,1,1) forwards}
+}
+/* v17 */
+@keyframes mGrow{from{transform:scaleX(0)}}
+@keyframes mTurn{from{transform:rotate(-120deg) scale(.6);opacity:0}}
+#heroRes:not([hidden]){animation:mIn .4s .8s ease-out backwards;--mdy:4px}
+.tp-bar span{transform-origin:0 50%}
+.m-enter .tp-bar span{animation:mGrow .6s cubic-bezier(.2,.75,.25,1) backwards;animation-delay:calc(160ms + var(--mj,0)*40ms)}
+.m-enter .mixbar{animation:mGrow .7s .2s cubic-bezier(.2,.75,.25,1) backwards}
+#btnTheme.m-turn svg{animation:mTurn .45s cubic-bezier(.2,.75,.25,1)}
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+html.m-vt-fade::view-transition-old(root){animation:mFadeOut .2s ease both}
+@keyframes mFlash{30%{opacity:.28}}
+.m-flash{position:relative}
+.m-flash::after{content:"";position:absolute;inset:-1px -4px;border-radius:5px;background:var(--fl,var(--gain-fill));opacity:0;pointer-events:none;animation:mFlash .7s ease-out}
+.m-flash.dn{--fl:var(--loss)}
+.m-enter .ms-prog .bar span{animation:mGrow .8s .25s cubic-bezier(.2,.75,.25,1) backwards}
+.m-enter .mw span{animation:mGrow .6s cubic-bezier(.2,.75,.25,1) backwards;animation-delay:calc(150ms + var(--mj,0)*35ms);transform-origin:0 50%}
+details.mcard>summary .mrow,.tile{transition:transform .12s ease}
+details.mcard>summary:active .mrow,.tile:active{transform:scale(.985)}
+.m-skel .ins .m-sk{width:100%}
+/* loading skeleton (until the saved data has arrived) */
+body.m-loading #banners,body.m-loading #refreshInfo{display:none!important}
+body.m-loading #heroDay,body.m-loading #heroPnl{visibility:hidden}
+body.m-loading #brandLine{align-self:flex-start;min-width:160px}
+body.m-loading #heroValue,body.m-loading #heroSub,body.m-loading #brandLine{color:transparent!important;background:var(--surface-2);border-radius:6px;animation:mPulse 1.2s ease-in-out infinite}
+body.m-loading #heroValue{min-width:220px}
+body.m-loading #heroSub{min-width:min(280px,85%);align-self:flex-start}
+body.m-loading #heroSub *{color:transparent!important}
+.m-skel .m-sk{display:block;background:var(--surface-2);border-radius:6px;height:12px;animation:mPulse 1.2s ease-in-out infinite}
+.m-skel .m-sk.v{height:24px;width:70%}
+.m-skel .m-sk.c{height:220px;border-radius:8px}
+.m-skel .m-sk.r{height:14px}
+@media (prefers-reduced-motion:reduce){
+  .m-enter>*,.m-enter .tiles>*,.m-enter .kpis>*,.modal,.overlay:not([hidden]),.toast:not([hidden]),.m-ghost,.m-ghost .modal{animation:none!important}
+  #heroRes,.m-enter .tp-bar span,.m-enter .mixbar,#btnTheme.m-turn svg,.m-flash::after,.m-enter .ms-prog .bar span,.m-enter .mw span{animation:none!important}
+  details.mcard>summary:active .mrow,.tile:active{transform:none!important}
+  .m-skel .m-sk,body.m-loading #heroValue,body.m-loading #heroSub,body.m-loading #brandLine{animation:none!important}
+  nav.tabs .m-ink,.btn,.bnav button svg{transition:none!important}
+  .btn:active,.seg button:active,.sheet-list button:active,.bnav button:active svg{transform:none!important}
+}

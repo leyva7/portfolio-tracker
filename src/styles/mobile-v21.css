@@ -1,0 +1,24 @@
+/* iPhone: inside the claude.ai frame the safe-area inset reads 0, so keep the bottom bar clear of the home gesture */
+@media (max-width:640px) and (pointer:coarse){:root{--sab:max(env(safe-area-inset-bottom,0px),22px)}}
+/* v21 mobile */
+.hs-twr{white-space:nowrap}
+@media (min-width:641px){.hs-twr{display:none}}
+@media (max-width:640px){
+  .mrow.fgs .l2{white-space:normal}
+  .pjcls th:nth-child(2),.pjcls td:nth-child(2){display:none}
+  .pjcls td{padding:6px 4px}.pjcls input{width:56px;padding:10px 6px}
+  #pjTbl th:first-child,#pjTbl td:first-child{position:sticky;left:0;z-index:1;background:var(--surface);box-shadow:-12px 0 0 var(--surface)}
+  #pjTbl td:first-child .small{display:none}
+  .btn,.typepick button{min-height:44px}
+  .seg button,.lgbtn,a[data-goto],#txUseLast{position:relative}
+  .seg button::after,.lgbtn::after,a[data-goto]::after,#txUseLast::after{content:"";position:absolute;inset:-7px 0}
+  .lgbtn::after,a[data-goto]::after,#txUseLast::after{inset:-15px -6px}
+  details:not(.mcard):not(.stale-chip)>summary{padding-block:11px;min-height:44px}
+  .panel .form-actions .btn{min-height:44px}
+  input[type=range]{height:44px}
+  label:has(>input[type=checkbox]){min-height:44px;display:inline-flex;align-items:center;gap:8px}
+  .stale-chip>summary{position:relative}.stale-chip>summary::after{content:"";position:absolute;inset:-10px 0}
+  .mrow:not(.fgs) .l2{white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+  .modal #aForm>.form-actions{position:static;margin-bottom:0}
+}
+@media (max-width:380px){.mlist .mrow .r2{font-size:13px;letter-spacing:-.02em}}

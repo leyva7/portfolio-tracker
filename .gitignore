@@ -1,0 +1,10 @@
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+# generado por tools/demo-seed.js (depende de la fecha)
+fixtures/
+# configuración personal de las rutinas (usa config.example.json como plantilla)
+rutinas/correo/config.json
+# capturas de pruebas locales
+shots/
